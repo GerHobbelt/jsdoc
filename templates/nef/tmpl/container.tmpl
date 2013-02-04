@@ -1,0 +1,74 @@
+<?js
+    var self = this;
+?>
+    <div role="main">
+        <h1>API documentation</h1>
+
+        <?js 
+            Object.keys(self.workers).forEach( function(worker) { 
+            var data = self.workers[worker];
+        ?>
+            <div class="worker">
+                <h2><?js= worker ?></h2>
+
+                <h3>Return structures</h3>
+                <dl>
+                <?js
+                    data.structure.forEach( function(structure) {
+                ?>
+                    <?js= self.partial('members.tmpl', structure) ?>
+                <?js
+                    })
+                ?>
+                </dl>
+                <h3>Methods</h3>
+                <dl>
+                <?js
+                    data.apimethod.forEach( function(apimethod) {
+                ?>
+                    <?js= self.partial('method.tmpl', apimethod) ?>
+                <?js
+                    })
+                ?>
+                </dl>
+            </div>   
+          
+        <?js
+            })
+        ?>
+
+    </div>
+
+    <div role="navigation">
+        <h2>API Index</h2>
+        <ul>
+        <?js 
+            Object.keys(self.workers).forEach( function(worker) { 
+            var data = self.workers[worker];
+        ?>
+            <li>
+                <h3><?js= worker ?></h3>
+
+                <ul>
+                <?js
+                  data.structure.forEach( function(structure) {  
+                ?>
+                    <li class="structure">structure:<?js= self.linkto(structure.longname, self.htmlsafe(structure.name)) ?></li>
+                <?js 
+                    }) 
+                ?>
+
+                <?js
+                  data.apimethod.forEach( function(method) {  
+                ?>
+                    <li class="method">method:<?js= self.linkto(method.longname, self.htmlsafe(method.name)) ?></li>
+                <?js 
+                    }) 
+                ?>
+                </ul>
+            </li>
+        <?js 
+            }) 
+        ?>
+        </ul>
+    </div>
