@@ -8,10 +8,11 @@ var conf = env.conf.nef;
 var Token = Packages.org.mozilla.javascript.Token;
 var apiMethods = {};
 
+exports.handlers = {};
 exports.nodeVisitor = { visitNode: nodeProcessor };
 
 function nodeProcessor (node, e, parser, currentSourceName) {
-    if (!node.parent)
+    if (!node || !node.parent || !node.type)
         return;
 
     // skip functions inside apimethod declarations
@@ -19,7 +20,7 @@ function nodeProcessor (node, e, parser, currentSourceName) {
         e.event = "symbolFound";
         return e.preventDefault = true;
     }
-   
+
     if (node.type !== Token.CALL)
         return;
 
@@ -35,9 +36,11 @@ function nodeProcessor (node, e, parser, currentSourceName) {
         return;
 
     var name = String(node.arguments.get(0).value);
+    apiMethods[node.hashCode()] = true;
 
-    var workerName = currentSourceName.match(/(\w+)Worker\.js$/);
-    workerName = ( workerName && workerName[1] ) || 'unknown'; 
+    var data = currentSourceName.match(/(atomic|compound)Workers\/(\w+)\//);
+    var workerType = ( data && data[1] ) || 'unknown'; 
+    var workerName = ( data && data[2] ) || 'unknown'; 
 
     e.id = 'astnode' + node.hashCode(); 
     e.comment = String(node.jsDoc || '');
@@ -57,24 +60,32 @@ function nodeProcessor (node, e, parser, currentSourceName) {
     };
     e.nef = {
         worker : workerName,
+        workerType : workerType,
         type   : 'apimethod',
-        longname: workerName+'.'+name,
+        longname: workerType+'.'+workerName+'.'+name,
     };
 }
+
+exports.handlers.beforeParse = function (e) {
+    e.source = e.source.replace(/#!\/usr\/bin\/node/,'');
+};
 
 exports.defineTags = function (dictionary) {
     dictionary.defineTag('structure', {
         isNamespace : true,
         onTagged : function(doclet, tag) {
-            var workerName = doclet.meta.filename.match(/^(\w+)Worker\.js$/)[1];
+            var data = doclet.meta.path.match(/(atomic|compound)Workers\/(\w+)\//);
+            var workerType = ( data && data[1]) || 'unknown';
+            var workerName = ( data && data[2]) || 'unknown';
             var name = tag.text.match(/^([A-Za-z]+)(?:\s.*)?$/)[1];
             doclet.addTag('kind', 'structure');
             doclet.addTag('scope', 'inner');
             doclet.addTag('name', name);
             doclet.meta.nef = {
-                worker   : workerName,
-                longname : workerName+'.'+name,
-                type     : 'structure'
+                worker     : workerName,
+                workerType : workerType,
+                longname   : workerType+'.'+workerName+'.'+name,
+                type       : 'structure'
             };
         }
     });
