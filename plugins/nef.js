@@ -74,7 +74,8 @@ exports.defineTags = function (dictionary) {
     dictionary.defineTag('structure', {
         isNamespace : true,
         onTagged : function(doclet, tag) {
-            var data = doclet.meta.path.match(/(atomic|compound)Workers\/(\w+)\//);
+console.log(require('util').inspect(doclet));
+            var data = doclet.meta.path.match(/(atomic|compound)Workers\/(\w+)\/?/);
             var workerType = ( data && data[1]) || 'unknown';
             var workerName = ( data && data[2]) || 'unknown';
             var name = tag.text.match(/^([A-Za-z]+)(?:\s.*)?$/)[1];
