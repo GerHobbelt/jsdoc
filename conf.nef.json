@@ -3,7 +3,7 @@
         "allowUnknownTags": true
     },
     "source": {
-        "includePattern": "^.+(atomic|compound)Workers.+\\.js$",
+        "includePattern": "^.+(atomicWorkers|compoundWorkers|lib/nef|nodeApps|wengui/webApps).+\\.js$",
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "plugins": ["plugins/nef.js"],
