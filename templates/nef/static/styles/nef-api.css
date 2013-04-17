@@ -35,7 +35,7 @@ h2~h3 {
   margin-left: 1.2em;
 }
         h2~h3:before {
-          content: '\2043\0a';
+          content: '\2023\0a';
         }
 
 [role="navigation"] {

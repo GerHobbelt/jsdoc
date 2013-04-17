@@ -3,8 +3,8 @@
         "allowUnknownTags": true
     },
     "source": {
-        "includePattern": "^.+(atomicWorkers|compoundWorkers|lib/nef|nodeApps|wengui/webApps).+\\.js$",
-        "excludePattern": "(^|\\/|\\\\)_"
+	"includePattern": "^.+(atomicWorkers|compoundWorkers|lib/nef|nodeApps|wengui/webApps).+\\.js$",        
+	"excludePattern": "(^|\\/|\\\\)_"
     },
     "plugins": ["plugins/nef.js"],
     "templates": {
