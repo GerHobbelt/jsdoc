@@ -14,7 +14,6 @@ exports.handlers = {
      * @param e.source
      */
     beforeParse: function(e) {
-
         var jsSource = '';
 
         // matches text between /** and */ inclusive and <!-- and --> inclusive
@@ -53,7 +52,7 @@ exports.handlers = {
             }
         });
 
-        e.source = jsSource;
+        e.source = jsSource || e.source;
 
     }
 };
