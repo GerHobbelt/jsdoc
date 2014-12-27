@@ -1,7 +1,8 @@
-/*global describe, expect, it, jasmine, spyOn */
-describe("multiple doclets per symbol", function() {
+'use strict';
+
+describe('multiple doclets per symbol', function() {
     function undocumented($) {
-        return ! $.undocumented;
+        return !($.undocumented);
     }
 
     function checkInequality(doclets, property) {

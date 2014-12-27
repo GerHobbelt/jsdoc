@@ -1,4 +1,3 @@
-/*global describe, expect, it */
 'use strict';
 
 describe('jsdoc/name', function() {
@@ -31,6 +30,16 @@ describe('jsdoc/name', function() {
     it("should export a 'shorten' function", function() {
         expect(jsdoc.name.shorten).toBeDefined();
         expect(typeof jsdoc.name.shorten).toBe('function');
+    });
+
+    it('should export a "combine" function', function() {
+        expect(jsdoc.name.combine).toBeDefined();
+        expect(typeof jsdoc.name.combine).toBe('function');
+    });
+
+    it('should export a "longnamesToTree" function', function() {
+        expect(jsdoc.name.longnamesToTree).toBeDefined();
+        expect(typeof jsdoc.name.longnamesToTree).toBe('function');
     });
 
     it("should export a 'splitName' function", function() {
@@ -224,6 +233,14 @@ describe('jsdoc/name', function() {
         });
     });
 
+    xdescribe('combine', function() {
+        // TODO: tests
+    });
+
+    xdescribe('longnamesToTree', function() {
+        // TODO: tests
+    });
+
     describe('splitName', function() {
         it('should find the name and description.', function() {
             var startName = 'ns.Page#"last \\"sentence\\"".words~sort(2)   - This is a description. ';
@@ -247,6 +264,40 @@ describe('jsdoc/name', function() {
 
             expect(parts.name).toBe('socket');
             expect(parts.description).toBe('- The networking kind, not the wrench.');
+        });
+
+        it('should allow default values to have brackets', function() {
+            var startName = '[path=["home", "user"]] - Path split into components';
+            var parts = jsdoc.name.splitName(startName);
+
+            expect(parts.name).toBe('[path=["home", "user"]]');
+            expect(parts.description).toBe('Path split into components');
+        });
+
+        it('should allow default values to have unmatched brackets inside strings', function() {
+            var startName = '[path=["Unmatched begin: ["]] - Path split into components';
+            var parts = jsdoc.name.splitName(startName);
+
+            expect(parts.name).toBe('[path=["Unmatched begin: ["]]');
+            expect(parts.description).toBe('Path split into components');
+        });
+
+        it('should fail gracefully when the default value has an unmatched bracket', function() {
+            var startName = '[path=["home", "user"] - Path split into components';
+            var parts = jsdoc.name.splitName(startName);
+
+            expect(parts).not.toBe(null);
+            expect(parts.name).toBe('[path=["home", "user"]');
+            expect(parts.description).toBe('Path split into components');
+        });
+
+        it('should fail gracefully when the default value has an unmatched quote', function() {
+            var startName = '[path=["home", "user] - Path split into components';
+            var parts = jsdoc.name.splitName(startName);
+
+            expect(parts).not.toBe(null);
+            expect(parts.name).toBe('[path=["home", "user]');
+            expect(parts.description).toBe('Path split into components');
         });
     });
 
