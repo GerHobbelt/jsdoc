@@ -269,28 +269,37 @@ function attachModuleSymbols(doclets, modules) {
 
     return modules.map(function(module) {
         if (symbols[module.longname]) {
-            module.modules = symbols[module.longname].map(function(symbol) {
-                symbol = doop(symbol);
+            module.modules = symbols[module.longname]
+                // Only show symbols that have a description. Make an exception for classes, because
+                // we want to show the constructor-signature heading no matter what.
+                .filter(function(symbol) {
+                    return symbol.description || symbol.kind === 'class';
+                })
+                .map(function(symbol) {
+                    symbol = doop(symbol);
 
-                if (symbol.kind === 'class' || symbol.kind === 'function') {
-                    symbol.name = symbol.name.replace('module:', '(require("') + '"))';
-                }
+                    if (symbol.kind === 'class' || symbol.kind === 'function') {
+                        symbol.name = symbol.name.replace('module:', '(require("') + '"))';
+                    }
 
-                return symbol;
-            });
+                    return symbol;
+                });
         }
     });
 }
 
-function buildMemberNav(items, itemHeading, itemsSeen) {
+function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
     var nav = '';
 
     if (items.length) {
         var itemsNav = '';
 
         items.forEach(function(item) {
-            if ( !hasOwnProp.call(itemsSeen, item.longname) ) {
-                itemsNav += '<li>' + linkto(item.longname, item.name.replace(/^module:/, '')) + '</li>';
+            if ( !hasOwnProp.call(item, 'longname') ) {
+                itemsNav += '<li>' + linktoFn('', item.name) + '</li>';
+            }
+            else if ( !hasOwnProp.call(itemsSeen, item.longname) ) {
+                itemsNav += '<li>' + linktoFn(item.longname, item.name.replace(/^module:/, '')) + '</li>';
                 itemsSeen[item.longname] = true;
             }
         });
