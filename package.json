@@ -1,7 +1,7 @@
 {
   "name": "jsdoc-75lb",
-  "version": "v3.3.0-alpha13-3",
-  "revision": "1421032593200",
+  "version": "3.4.0-dev-1",
+  "revision": "1421967726711",
   "description": "An API documentation generator for JavaScript.",
   "keywords": [
     "documentation",
@@ -13,31 +13,31 @@
     "url": "https://github.com/jsdoc3/jsdoc"
   },
   "dependencies": {
-    "async": "~0.1.22",
+    "async": "~0.9.0",
     "catharsis": "~0.8.6",
-    "escape-string-regexp": "~1.0.0",
-    "esprima": "https://github.com/ariya/esprima/tarball/49a2eccb243f29bd653b11e9419241a9d726af7c",
-    "js2xmlparser": "~0.1.0",
-    "marked": "~0.3.1",
+    "escape-string-regexp": "~1.0.2",
+    "espree": "1.7.1",
+    "js2xmlparser": "~0.1.7",
+    "marked": "~0.3.2",
     "requizzle": "~0.2.0",
-    "strip-json-comments": "~0.1.3",
-    "taffydb": "https://github.com/hegemonic/taffydb/tarball/master",
-    "underscore": "~1.6.0",
-    "wrench": "~1.3.9"
+    "strip-json-comments": "~1.0.2",
+    "taffydb": "https://github.com/hegemonic/taffydb/tarball/7d100bcee0e997ee4977e273cdce60bd8933050e",
+    "underscore": "~1.7.0",
+    "wrench": "~1.5.8"
   },
   "devDependencies": {
-    "eslint": "~0.11.0",
+    "eslint": "~0.13.0",
     "gulp": "~3.8.5",
-    "gulp-eslint": "~0.1.7",
+    "gulp-eslint": "~0.2.0",
     "gulp-json-editor": "~2.0.2",
-    "istanbul": "~0.2.1",
+    "istanbul": "~0.2.16",
     "tv4": "https://github.com/hegemonic/tv4/tarball/own-properties"
   },
   "engines": {
     "node": ">=0.10"
   },
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp lint; gulp test"
   },
   "bin": {
     "jsdoc": "./jsdoc.js"

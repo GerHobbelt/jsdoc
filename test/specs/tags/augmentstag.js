@@ -6,6 +6,7 @@
     var docSet3 = jasmine.getDocSetFromFile('test/fixtures/augmentstag3.js');
     var docSet4 = jasmine.getDocSetFromFile('test/fixtures/augmentstag4.js');
     var docSet5 = jasmine.getDocSetFromFile('test/fixtures/augmentstag5.js');
+    var docSet6 = jasmine.getDocSetFromFile('test/fixtures/augmentstag6.js');
 
     it('When a symbol has an @augments tag, the doclet has a augments property that includes that value.', function() {
         var bar = docSet.getByLongname('Bar')[0];
@@ -148,11 +149,27 @@
         expect(derivedMethod1.description).toBe(baseMethod1.description);
     });
 
+    it('When a symbol inherits an explicitly named symbol, the inherited symbol is documented', function() {
+        var baseMethod3 = docSet4.getByLongname('Base#test3')[0];
+        var derivedMethod3 = docSet4.getByLongname('Derived#test3')[0];
+
+        expect(derivedMethod3).toBeDefined();
+        expect(derivedMethod3.comment).toBe(baseMethod3.comment);
+    });
+
     it('When a symbol inherits two methods that would both have the same longname, the last one wins', function() {
         var base1CommonMethod = docSet5.getByLongname('Base1#methodOfBaseCommon')[0];
         var classCommonMethod = docSet5.getByLongname('Class#methodOfBaseCommon');
 
         expect(classCommonMethod.length).toBe(1);
         expect(classCommonMethod[0].description).toBe(base1CommonMethod.description);
+    });
+
+    it('Interfaces can augment other interfaces', function() {
+        var connectionOpen = docSet6.getByLongname('IConnection#open')[0];
+        var closableConnectionOpen = docSet6.getByLongname('IClosableConnection#open')[0];
+
+        expect(closableConnectionOpen).toBeDefined();
+        expect(closableConnectionOpen.description).toBe(connectionOpen.description);
     });
 });
