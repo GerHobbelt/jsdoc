@@ -16,6 +16,8 @@
 module.exports = (function() {
 'use strict';
 
+var app = require('jsdoc/app');
+var env = require('jsdoc/env');
 var logger = require('jsdoc/util/logger');
 var stripJsonComments = require('strip-json-comments');
 
@@ -27,9 +29,6 @@ var props = {
     shouldExitWithError: false,
     tmpdir: null
 };
-
-var app = global.app;
-var env = global.env;
 
 var FATAL_ERROR_MESSAGE = 'Exiting JSDoc because an error occurred. See the previous log ' +
     'messages for details.';
@@ -398,7 +397,7 @@ cli.processParseResults = function() {
 };
 
 cli.dumpParseResults = function() {
-    global.dump(props.docs);
+    console.log(require('jsdoc/util/dumper').dump(props.docs));
 
     return cli;
 };

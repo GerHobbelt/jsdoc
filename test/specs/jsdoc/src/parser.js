@@ -4,9 +4,14 @@
 describe('jsdoc/src/parser', function() {
     var fs = require('jsdoc/fs');
     var jsdoc = {
+        env: require('jsdoc/env'),
         src: {
             handlers: require('jsdoc/src/handlers'),
             parser: require('jsdoc/src/parser')
+        },
+        util: {
+            logger: require('jsdoc/util/logger'),
+            runtime: require('jsdoc/util/runtime')
         }
     };
     var path = require('jsdoc/path');
@@ -16,9 +21,43 @@ describe('jsdoc/src/parser', function() {
         expect(typeof jsdoc.src.parser).toBe('object');
     });
 
+    it('should export a "createParser" method', function() {
+        expect(typeof jsdoc.src.parser.createParser).toBe('function');
+    });
+
     it('should export a "Parser" constructor', function() {
-        expect(jsdoc.src.parser.Parser).toBeDefined();
         expect(typeof jsdoc.src.parser.Parser).toBe('function');
+    });
+
+    describe('createParser', function() {
+        it('should return a Parser when called without arguments', function() {
+            // we don't check instanceof because we get different objects on Node.js and Rhino
+            expect(typeof jsdoc.src.parser.createParser()).toBe('object');
+        });
+
+        it('should create a jsdoc/src/parser.Parser instance with the argument "js"', function() {
+            var parser = jsdoc.src.parser.createParser('js');
+
+            expect(parser instanceof jsdoc.src.parser.Parser).toBe(true);
+        });
+
+        if (jsdoc.util.runtime.isRhino()) {
+            it('should create a Rhino parser with the argument "rhino"', function() {
+                var RhinoParser = require('rhino/jsdoc/src/parser').Parser;
+                var parser = jsdoc.src.parser.createParser('rhino');
+
+                expect(parser instanceof RhinoParser).toBe(true);
+            });
+        }
+
+        it('should log a fatal error on bad input', function() {
+            var parser;
+
+            spyOn(jsdoc.util.logger, 'fatal');
+            parser = jsdoc.src.parser.createParser('not-a-real-parser-ever');
+
+            expect(jsdoc.util.logger.fatal).toHaveBeenCalled();
+        });
     });
 
     describe('Parser', function() {
@@ -44,7 +83,9 @@ describe('jsdoc/src/parser', function() {
 
         it('should accept an astBuilder, visitor, and walker as arguments', function() {
             var astBuilder = {};
-            var visitor = {};
+            var visitor = {
+                setParser: function() {}
+            };
             var walker = {};
 
             var myParser = new jsdoc.src.parser.Parser(astBuilder, visitor, walker);
@@ -267,7 +308,7 @@ describe('jsdoc/src/parser', function() {
                 it('should not throw errors when parsing files with ES6 syntax', function() {
                     function parse() {
                         var parserSrc = 'javascript:' + fs.readFileSync(
-                            path.join(global.env.dirname, 'test/fixtures/es6.js'), 'utf8');
+                            path.join(jsdoc.env.dirname, 'test/fixtures/es6.js'), 'utf8');
                         parser.parse(parserSrc);
                     }
 
@@ -276,7 +317,7 @@ describe('jsdoc/src/parser', function() {
             }
 
             it('should be able to parse its own source file', function() {
-                var parserSrc = 'javascript:' + fs.readFileSync(path.join(global.env.dirname,
+                var parserSrc = 'javascript:' + fs.readFileSync(path.join(jsdoc.env.dirname,
                     'lib/jsdoc/src/parser.js'), 'utf8');
 
                 function parse() {
@@ -347,7 +388,7 @@ describe('jsdoc/src/parser', function() {
                     jsdocCommentFound: [],
                     symbolFound: []
                 };
-                var source = fs.readFileSync(path.join(global.env.dirname,
+                var source = fs.readFileSync(path.join(jsdoc.env.dirname,
                     'test/fixtures/eventorder.js'), 'utf8');
 
                 function pushEvent(e) {
