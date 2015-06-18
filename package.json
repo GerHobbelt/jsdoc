@@ -1,7 +1,7 @@
 {
   "name": "jsdoc-75lb",
   "version": "3.4.0-dev.7",
-  "revision": "1424228843897",
+  "revision": "1434307747571",
   "description": "An API documentation generator for JavaScript.",
   "keywords": [
     "documentation",
@@ -17,7 +17,7 @@
     "bluebird": "~2.9.14",
     "catharsis": "~0.8.7",
     "escape-string-regexp": "~1.0.2",
-    "espree": "~1.12.3",
+    "espree": "~2.0.3",
     "js2xmlparser": "~0.1.7",
     "marked": "~0.3.2",
     "requizzle": "~0.2.0",
@@ -27,9 +27,8 @@
     "wrench": "~1.5.8"
   },
   "devDependencies": {
-    "eslint": "~0.13.0",
     "gulp": "~3.8.5",
-    "gulp-eslint": "~0.2.0",
+    "gulp-eslint": "~0.13.2",
     "gulp-json-editor": "~2.0.2",
     "istanbul": "~0.2.16",
     "tv4": "https://github.com/hegemonic/tv4/tarball/own-properties"
