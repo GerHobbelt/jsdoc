@@ -1,10 +1,14 @@
-JSDoc 3
+JSDoc 3 (75lb derivative)
 =======
 [![Build Status](https://travis-ci.org/jsdoc3/jsdoc.svg?branch=master)](http://travis-ci.org/jsdoc3/jsdoc)
 
 An API documentation generator for JavaScript.
 
 Want to contribute to JSDoc? Please read `CONTRIBUTING.md`.
+
+## jsdoc-75lb
+
+This is a fork of the [jsdoc3](https://github.com/jsdoc3/jsdoc) project. It has a couple of things added, namely support for parsing html files. It's used by [jsdoc-parse](https://github.com/jsdoc2md/jsdoc-parse).
 
 Installation and Usage
 ----------------------
