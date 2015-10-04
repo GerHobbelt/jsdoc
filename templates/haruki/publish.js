@@ -215,6 +215,19 @@ exports.publish = function(data, opts) {
         }
     }
     else {
-        console.log('This template only supports output to the console. Use the option "-d console" when you run JSDoc.');
+        var fs = require("jsdoc/fs"),
+            path = require('jsdoc/path'),
+            xml = require('js2xmlparser'),
+            outputDir = path.normalize(opts.destination),
+            outputFormat = opts.query && opts.query.format === 'xml' ? 'xml' : 'json';
+
+        fs.mkPath(outputDir);
+
+        root.classes.forEach(function(item) {
+            fs.writeFileSync(
+                path.join(outputDir, item.name + "." + outputFormat),
+                outputFormat === 'json' ? JSON.stringify(item, null, 4) :  xml('jsdoc', item),
+                'utf8');
+        });
     }
 };
