@@ -40,6 +40,13 @@ describe('@enum tag', function() {
         });
     });
 
+    it('Should support numeric keys', function() {
+        var docSet = jasmine.getDocSetFromFile('test/fixtures/numericenum.js');
+        var numericEnum = docSet.getByLongname('NumericEnum')[0];
+        expect(numericEnum.properties[0].name).toBe('0');
+        expect(numericEnum.properties[1].name).toBe('1');
+    });
+
     describe('chained assignments', function() {
         var docSet2 = jasmine.getDocSetFromFile('test/fixtures/enumtag2.js');
         var pentaState = docSet2.getByLongname('module:my/enums.PentaState')[0];
