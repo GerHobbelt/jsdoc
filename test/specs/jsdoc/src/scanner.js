@@ -1,5 +1,7 @@
-/*global describe, env, expect, it */
+'use strict';
+
 describe('jsdoc/src/scanner', function() {
+    var env = require('jsdoc/env');
     var path = require('jsdoc/path');
     var scanner = require('jsdoc/src/scanner');
 

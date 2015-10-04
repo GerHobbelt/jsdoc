@@ -1,4 +1,4 @@
-/*eslint max-nested-callbacks: 0 */
+/* eslint max-nested-callbacks: 0 */
 'use strict';
 
 var eslint = require('gulp-eslint');
@@ -27,7 +27,8 @@ var options = {
         'lib/**/*.js',
         'plugins/*.js',
         'templates/default/*.js',
-        'templates/haruki/*.js'
+        'templates/haruki/*.js',
+        'test/specs/**/*.js'
     ],
     nodeBin: path.resolve(__dirname, './jsdoc.js'),
     nodePath: process.execPath,
@@ -63,19 +64,19 @@ gulp.task('lint', function() {
 });
 
 gulp.task('test-node', function(cb) {
-    var cmd = util.format('"%s" %s -T', options.nodePath, options.nodeBin);
+    var cmd = util.format('"%s" "%s" -T', options.nodePath, options.nodeBin);
     exec(cmd, execCb.bind(null, cb));
 });
 
 gulp.task('test-rhino', function(cb) {
-    var cmd = util.format('%s -T -q "parser=rhino"', options.rhinoBin);
+    var cmd = util.format('"%s" -T -q "parser=rhino"', options.rhinoBin);
     exec(cmd, execCb.bind(null, cb));
 });
 
-gulp.task('test-rhino-esprima', function(cb) {
-    var cmd = util.format('%s -T -q "parser=esprima"', options.rhinoBin);
+gulp.task('test-rhino-jsparser', function(cb) {
+    var cmd = util.format('"%s" -T -q "parser=js"', options.rhinoBin);
     exec(cmd, execCb.bind(null, cb));
 });
 
-gulp.task('test', ['lint', 'test-node', 'test-rhino', 'test-rhino-esprima']);
-gulp.task('default', ['test']);
+gulp.task('test', ['test-node', 'test-rhino', 'test-rhino-jsparser']);
+gulp.task('default', ['lint', 'test']);

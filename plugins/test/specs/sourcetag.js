@@ -1,10 +1,11 @@
-/*global describe: true, env: true, expect: true, it: true, jasmine: true */
-describe("sourcetag plugin", function() {
-    var parser = jasmine.createParser();
+'use strict';
+
+describe('sourcetag plugin', function() {
+    var env = require('jsdoc/env');
     var path = require('jsdoc/path');
 
     var docSet;
-
+    var parser = jasmine.createParser();
     var pluginPath = 'plugins/sourcetag';
     var pluginPathResolved = path.join(env.dirname, pluginPath);
     var plugin = require(pluginPathResolved);
@@ -13,9 +14,9 @@ describe("sourcetag plugin", function() {
     docSet = jasmine.getDocSetFromFile(pluginPath + '.js', parser);
 
     it("should set the lineno and filename of the doclet's meta property", function() {
-        var doclet = docSet.getByLongname("module:plugins/sourcetag.handlers.newDoclet");
+        var doclet = docSet.getByLongname('module:plugins/sourcetag.handlers.newDoclet');
         expect(doclet[0].meta).toBeDefined();
-        expect(doclet[0].meta.filename).toEqual("sourcetag.js");
+        expect(doclet[0].meta.filename).toEqual('sourcetag.js');
         expect(doclet[0].meta.lineno).toEqual(13);
     });
 });

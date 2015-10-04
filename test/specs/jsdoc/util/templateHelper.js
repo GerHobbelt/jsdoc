@@ -1,13 +1,19 @@
-/*global afterEach, beforeEach, describe, expect, env, it, jasmine, spyOn */
+/*eslint quotes:0 */
+'use strict';
+
 var hasOwnProp = Object.prototype.hasOwnProperty;
 
 describe("jsdoc/util/templateHelper", function() {
-    var helper = require('jsdoc/util/templateHelper'),
-        doclet = require('jsdoc/doclet'),
-        doop = require('jsdoc/util/doop'),
-        logger = require('jsdoc/util/logger'),
-        resolver = require('jsdoc/tutorial/resolver'),
-        taffy = require('taffydb').taffy;
+    var definitions = require('jsdoc/tag/dictionary/definitions');
+    var dictionary = require('jsdoc/tag/dictionary');
+    var doclet = require('jsdoc/doclet');
+    var doop = require('jsdoc/util/doop');
+    var env = require('jsdoc/env');
+    var helper = require('jsdoc/util/templateHelper');
+    var logger = require('jsdoc/util/logger');
+    var resolver = require('jsdoc/tutorial/resolver');
+    var taffy = require('taffydb').taffy;
+
     helper.registerLink('test', 'path/to/test.html');
 
     it("should exist", function() {
@@ -38,6 +44,11 @@ describe("jsdoc/util/templateHelper", function() {
     it("should export a 'getUniqueFilename' function", function() {
         expect(helper.getUniqueFilename).toBeDefined();
         expect(typeof helper.getUniqueFilename).toBe("function");
+    });
+
+    it("should export a 'getUniqueId' function", function() {
+        expect(helper.getUniqueId).toBeDefined();
+        expect(typeof helper.getUniqueId).toBe('function');
     });
 
     it("should export a 'longnameToUrl' property", function() {
@@ -85,6 +96,11 @@ describe("jsdoc/util/templateHelper", function() {
         expect(typeof helper.getSignatureReturns).toBe("function");
     });
 
+    it("should export a 'getAncestors' function", function() {
+        expect(helper.getAncestors).toBeDefined();
+        expect(typeof helper.getAncestors).toBe('function');
+    });
+
     it("should export a 'getAncestorLinks' function", function() {
         expect(helper.getAncestorLinks).toBeDefined();
         expect(typeof helper.getAncestorLinks).toBe("function");
@@ -130,6 +146,11 @@ describe("jsdoc/util/templateHelper", function() {
         expect(typeof helper.createLink).toBe("function");
     });
 
+    it('should export a "longnamesToTree" function', function() {
+        expect(helper.longnamesToTree).toBeDefined();
+        expect(typeof helper.longnamesToTree).toBe('function');
+    });
+
     describe("setTutorials", function() {
         // used in tutorialToUrl, toTutorial.
         it("setting tutorials to null causes all tutorial lookups to fail", function() {
@@ -167,6 +188,13 @@ describe("jsdoc/util/templateHelper", function() {
     });
 
     describe("getUniqueFilename", function() {
+        afterEach(function() {
+            var dict = new dictionary.Dictionary();
+
+            definitions.defineTags(dict);
+            doclet._replaceDictionary(dict);
+        });
+
         // TODO: needs more tests for unusual values and things that get special treatment (such as
         // inner members)
         it('should convert a simple string into the string plus the default extension', function() {
@@ -174,9 +202,18 @@ describe("jsdoc/util/templateHelper", function() {
             expect(filename).toBe('BackusNaur.html');
         });
 
-        it('should convert a string with slashes into the text following the last slash plus the default extension', function() {
+        it('should replace slashes with underscores', function() {
             var filename = helper.getUniqueFilename('tick/tock');
-            expect(filename).toMatch(/^tock\.html$/);
+            expect(filename).toBe('tick_tock.html');
+        });
+
+        it('should replace other problematic characters with underscores', function() {
+            var filename = helper.getUniqueFilename('a very strange \\/?*:|\'"<> filename');
+            expect(filename).toBe('a very strange __________ filename.html');
+        });
+
+        it('should not allow a filename to start with an underscore', function() {
+            expect( helper.getUniqueFilename('') ).toBe('-_.html');
         });
 
         it('should not return the same filename twice', function() {
@@ -199,6 +236,77 @@ describe("jsdoc/util/templateHelper", function() {
         it('should remove variations from the longname before generating the filename', function() {
             var filename = helper.getUniqueFilename('MyClass(foo, bar)');
             expect(filename).toBe('MyClass.html');
+        });
+
+        it('should generate the correct filename for built-in namespaces', function() {
+            var filenameEvent = helper.getUniqueFilename('event:userDidSomething');
+            var filenameExternal = helper.getUniqueFilename('external:NotInThisPackage');
+            var filenameModule = helper.getUniqueFilename('module:some/sort/of/module');
+            var filenamePackage = helper.getUniqueFilename('package:node-solve-all-your-problems');
+
+            expect(filenameEvent).toBe('event-userDidSomething.html');
+            expect(filenameExternal).toBe('external-NotInThisPackage.html');
+            expect(filenameModule).toBe('module-some_sort_of_module.html');
+            expect(filenamePackage).toBe('package-node-solve-all-your-problems.html');
+        });
+
+        it('should generate the correct filename for user-specified namespaces', function() {
+            var filename;
+            var dict = new dictionary.Dictionary();
+
+            dict.defineTag('anaphylaxis', {
+                isNamespace: true
+            });
+            definitions.defineTags(dict);
+            doclet._replaceDictionary(dict);
+
+            filename = helper.getUniqueFilename('anaphylaxis:peanut');
+
+            expect(filename).toBe('anaphylaxis-peanut.html');
+        });
+    });
+
+    describe('getUniqueId', function() {
+        it('should return the provided string in normal cases', function() {
+            var id = helper.getUniqueId('futon.html', 'backrest');
+            expect(id).toBe('backrest');
+        });
+
+        it('should return an empty string if no base ID is provided', function() {
+            var id = helper.getUniqueId('futon.html', '');
+            expect(id).toBe('');
+        });
+
+        it('should remove whitespace characters', function() {
+            var id = helper.getUniqueId('futon.html', 'a very long identifier');
+            expect(id).toBe('averylongidentifier');
+        });
+
+        it('should not return the same ID twice for a given file', function() {
+            var filename = 'futon.html';
+            var name = 'polymorphic';
+            var id1 = helper.getUniqueId(filename, name);
+            var id2 = helper.getUniqueId(filename, name);
+
+            expect(id1).not.toBe(id2);
+        });
+
+        it('should allow duplicate IDs if they are in different files', function() {
+            var name = 'magnificence';
+            var id1 = helper.getUniqueId('supersensational.html', name);
+            var id2 = helper.getUniqueId('razzledazzle.html', name);
+
+            expect(id1).toBe(id2);
+        });
+
+        it('should not consider the same name with different letter case to be unique', function() {
+            var camel = 'myJavaScriptIdentifier';
+            var pascal = 'MyJavaScriptIdentifier';
+            var filename = 'mercutio.html';
+            var id1 = helper.getUniqueId(filename, camel);
+            var id2 = helper.getUniqueId(filename, pascal);
+
+            expect( id1.toLowerCase() ).not.toBe( id2.toLowerCase() );
         });
     });
 
@@ -226,11 +334,13 @@ describe("jsdoc/util/templateHelper", function() {
         beforeEach(function() {
             helper.longnameToUrl.linktoTest = 'test.html';
             helper.longnameToUrl.LinktoFakeClass = 'fakeclass.html';
+            helper.longnameToUrl['Foo#bar(baz)'] = 'foo-bar-baz.html';
         });
 
         afterEach(function() {
             delete helper.longnameToUrl.linktoTest;
             delete helper.longnameToUrl.LinktoFakeClass;
+            delete helper.longnameToUrl['Foo#bar(baz)'];
         });
 
         it('returns the longname if only the longname is specified and has no URL', function() {
@@ -293,6 +403,26 @@ describe("jsdoc/util/templateHelper", function() {
                 '<a href="fakeclass.html">LinktoFakeClass</a>)>');
         });
 
+        it('works correctly with type unions that are not enclosed in parentheses', function() {
+            var link = helper.linkto('linktoTest|LinktoFakeClass', 'link text');
+            expect(link).toBe('(<a href="test.html">linktoTest</a>|' +
+                '<a href="fakeclass.html">LinktoFakeClass</a>)');
+        });
+
+        it('does not try to parse a longname starting with <anonymous> as a type application',
+            function() {
+            spyOn(logger, 'error');
+
+            helper.linkto('<anonymous>~foo');
+            expect(logger.error).not.toHaveBeenCalled();
+        });
+
+        it('does not treat a longname with a variation as a type application', function() {
+            var link = helper.linkto('Foo#bar(baz)', 'link text');
+
+            expect(link).toBe('<a href="foo-bar-baz.html">link text</a>');
+        });
+
         it('returns a link when a URL is specified', function() {
             var link = helper.linkto('http://example.com');
             expect(link).toBe('<a href="http://example.com">http://example.com</a>');
@@ -311,6 +441,13 @@ describe("jsdoc/util/templateHelper", function() {
         it('returns a link with a fragment ID if a URL and fragment ID are specified', function() {
             var link = helper.linkto('LinktoFakeClass', null, null, 'fragment');
             expect(link).toBe('<a href="fakeclass.html#fragment">LinktoFakeClass</a>');
+        });
+
+        it('returns the original text if an HTML <a> tag is specified', function() {
+            var text = '<a href="http://example.com">text</a>';
+            var link = helper.linkto(text);
+
+            expect(link).toBe(text);
         });
 
         it('returns the original text if an inline {@link} tag is specified', function() {
@@ -340,9 +477,18 @@ describe("jsdoc/util/templateHelper", function() {
             expect( helper.htmlsafe(input) ).toBe('foo &amp;&amp; bar &amp; baz;');
         });
 
-        it ('should not double-convert ampersands', function() {
+        it('should not double-convert ampersands', function() {
             var input = '<h1>Foo & Friends</h1>';
             expect( helper.htmlsafe(input) ).toBe('&lt;h1>Foo &amp; Friends&lt;/h1>');
+        });
+
+        it('should convert non-strings to strings', function() {
+            function htmlsafe() {
+                return helper.htmlsafe(false);
+            }
+
+            expect(htmlsafe).not.toThrow();
+            expect(htmlsafe()).toBe('false');
         });
     });
 
@@ -387,31 +533,35 @@ describe("jsdoc/util/templateHelper", function() {
         // instead parse a file from fixtures and verify it?
         var classes = [
             {kind: 'class'}, // global
-            {kind: 'class', memberof: 'SomeNamespace'}, // not global
+            {kind: 'class', memberof: 'SomeNamespace'} // not global
         ];
         var externals = [
-            {kind: 'external'},
+            {kind: 'external', name: 'foo'}
         ];
         var events = [
-            {kind: 'event'},
+            {kind: 'event'}
         ];
         var mixins = [
-            {kind: 'mixin'},
+            {kind: 'mixin'}
         ];
         var modules = [
-            {kind: 'module'},
+            {kind: 'module'}
         ];
         var namespaces = [
-            {kind: 'namespace'},
+            {kind: 'namespace'}
         ];
-        var misc = [
-            {kind: 'function'}, // global
-            {kind: 'member'}, // global
-            {kind: 'constant'}, // global
-            {kind: 'typedef'}, // global
-            {kind: 'constant', memberof: 'module:one/two'}, // not global
-            {kind: 'function', name: 'module:foo', longname: 'module:foo'} // not global
+        var miscGlobal = [
+            {kind: 'function'},
+            {kind: 'member'},
+            {kind: 'constant'},
+            {kind: 'typedef'}
         ];
+        var miscNonGlobal = [
+            {kind: 'constant', memberof: 'module:one/two'},
+            {kind: 'function', name: 'module:foo', longname: 'module:foo'},
+            {kind: 'member', name: 'module:bar', longname: 'module:bar'}
+        ];
+        var misc = miscGlobal.concat(miscNonGlobal);
         var array = classes.concat(externals.concat(events.concat(mixins.concat(modules.concat(namespaces.concat(misc))))));
         var data = taffy(array);
         var members = helper.getMembers(data);
@@ -471,12 +621,13 @@ describe("jsdoc/util/templateHelper", function() {
         });
 
         it("globals are detected", function() {
-            compareObjectArrays(misc.slice(0, -2), members.globals);
+            compareObjectArrays(miscGlobal, members.globals);
         });
     });
 
     describe("getAttribs", function() {
-        var doc, attribs;
+        var doc;
+        var attribs;
 
         it('should return an array of strings', function() {
             doc = new doclet.Doclet('/** ljklajsdf */', {});
@@ -492,16 +643,15 @@ describe("jsdoc/util/templateHelper", function() {
                 if (tests.hasOwnProperty(src)) {
                     doc = new doclet.Doclet('/** ' + src + ' */', {});
                     attribs = helper.getAttribs(doc);
+
                     if (tests[src]) {
                         expect(attribs).toContain(tests[src]);
-                    } else {
-                        if (Array.isArray(whatNotToContain)) {
-                            for (var i = 0; i < whatNotToContain.length; ++i) {
-                                expect(attribs).not.toContain(whatNotToContain[i]);
-                            }
-                        } else {
-                            expect(attribs.length).toBe(0);
+                    } else if (Array.isArray(whatNotToContain)) {
+                        for (var i = 0; i < whatNotToContain.length; ++i) {
+                            expect(attribs).not.toContain(whatNotToContain[i]);
                         }
+                    } else {
+                        expect(attribs.length).toBe(0);
                     }
                 }
             }
@@ -574,12 +724,27 @@ describe("jsdoc/util/templateHelper", function() {
         });
 
         it("should detect multiple attributes", function() {
-            var doc = new doclet.Doclet('/** @const module:fdsa~FOO\n@readonly\n@private */', {});
-            attribs = helper.getAttribs(doc);
+            var fdsaFoo = new doclet.Doclet('/** @const module:fdsa~FOO\n@readonly\n@private */', {});
+            attribs = helper.getAttribs(fdsaFoo);
+
             expect(attribs).toContain('private');
-            //expect(attribs).toContain('readonly'); // kind is 'constant' not 'member'.
+            // expect(attribs).toContain('readonly'); // kind is 'constant' not 'member'.
             expect(attribs).toContain('constant');
             expect(attribs).toContain('inner');
+        });
+
+        it('should return an empty array for null values', function() {
+            var emptyAttribs;
+
+            function getAttribs() {
+                return helper.getAttribs();
+            }
+
+            expect(getAttribs).not.toThrow();
+
+            emptyAttribs = getAttribs();
+            expect( Array.isArray(emptyAttribs) ).toBe(true);
+            expect(emptyAttribs.length).toBe(0);
         });
     });
 
@@ -741,6 +906,10 @@ describe("jsdoc/util/templateHelper", function() {
         });
     });
 
+    xdescribe('getAncestors', function() {
+        // TODO
+    });
+
     describe("getAncestorLinks", function() {
         // make a hierarchy.
         var lackeys = new doclet.Doclet('/** @member lackeys\n@memberof module:mafia/gangs.Sharks~Henchman\n@instance*/', {}),
@@ -834,6 +1003,13 @@ describe("jsdoc/util/templateHelper", function() {
     });
 
     describe("prune", function() {
+        var access = env.opts.access;
+        var priv = !!env.opts.private;
+
+        afterEach(function() {
+            env.opts.access = access;
+            env.opts.private = priv;
+        });
 
         var array = [
             // keep
@@ -849,11 +1025,24 @@ describe("jsdoc/util/templateHelper", function() {
             // prune
             {memberof: '<anonymous>'}
         ];
+        var keep = [
+            // keep
+            {undocumented: false},
+            // keep
+            {ignore: false},
+            // keep
+            {memberof: 'SomeClass'}
+        ];
         var arrayPrivate = [
             // prune (unless env.opts.private is truthy)
             {access: 'private'}
         ];
-        var keep = array.slice(0, 3);
+        var arrayMixed = [
+            {access: 'public'},
+            {asdf: true},
+            {access: 'protected'},
+            {access: 'private'}
+        ];
 
         it('should prune the correct members', function() {
             var pruned = helper.prune( taffy(array) )().get();
@@ -861,23 +1050,73 @@ describe("jsdoc/util/templateHelper", function() {
         });
 
         it('should prune private members if env.opts.private is falsy', function() {
-            var priv = !!env.opts.private;
+            var pruned;
 
             env.opts.private = false;
-            var pruned = helper.prune( taffy(arrayPrivate) )().get();
+            pruned = helper.prune( taffy(arrayPrivate) )().get();
             compareObjectArrays([], pruned);
+        });
 
-            env.opts.private = !!priv;
+        it('should only keep public members if env.opts.access only contains "public"', function() {
+            var pruned;
+            var keepPublic = [{access: 'public'}];
+
+            env.opts.access = 'public';
+            pruned = helper.prune( taffy(arrayMixed) )().get();
+            compareObjectArrays(keepPublic, pruned);
+        });
+
+        it('should only keep undefined members if env.opts.access only contains "undefined"', function() {
+            var pruned;
+            var keepUndefined = [{asdf: true}];
+
+            env.opts.access = 'undefined';
+            pruned = helper.prune( taffy(arrayMixed) )().get();
+            compareObjectArrays(keepUndefined, pruned);
+        });
+
+        it('should only keep protected members if env.opts.access only contains "protected"', function() {
+            var pruned;
+            var keepProtected = [{access: 'protected'}];
+
+            env.opts.access = 'protected';
+            pruned = helper.prune( taffy(arrayMixed) )().get();
+            compareObjectArrays(keepProtected, pruned);
+        });
+
+        it('should only keep private members if env.opts.access only contains "private"', function() {
+            var pruned;
+            var keepPrivate = [{access: 'private'}];
+
+            env.opts.access = 'private';
+            pruned = helper.prune( taffy(arrayMixed) )().get();
+            compareObjectArrays(keepPrivate, pruned);
+        });
+
+        it('should keep public and protected members if env.opts.access contains "public" and "protected"', function() {
+            var pruned;
+            var keepPublicProtected = [{access: 'public'}, {access: 'protected'}];
+
+            env.opts.access = ['public', 'protected'];
+            pruned = helper.prune( taffy(arrayMixed) )().get();
+            compareObjectArrays(keepPublicProtected, pruned);
+        });
+
+        it('should keep everything if env.opts.access contains "all"', function() {
+            var pruned;
+
+            env.opts.access = 'all';
+            pruned = helper.prune( taffy(arrayMixed) )().get();
+
+            compareObjectArrays(arrayMixed, pruned);
         });
 
         it('should not prune private members if env.opts.private is truthy', function() {
-            var priv = !!env.opts.private;
+            var pruned;
 
             env.opts.private = true;
-            var pruned = helper.prune( taffy(arrayPrivate) )().get();
+            pruned = helper.prune( taffy(arrayPrivate) )().get();
             compareObjectArrays(arrayPrivate, pruned);
-
-            env.opts.private = !!priv;
         });
     });
 
@@ -1244,7 +1483,6 @@ describe("jsdoc/util/templateHelper", function() {
             expect(output).toBe('Link to <a href="path/to/test.html"><code>test</code></a> and <a href="http://github.com">http://github.com</a>');
             restoreConfTemplates(storage);
         });
-
     });
 
     describe("createLink", function() {
@@ -1252,7 +1490,8 @@ describe("jsdoc/util/templateHelper", function() {
             var mockDoclet = {
                     kind: 'function',
                     longname: 'foo',
-                    name: 'foo'
+                    name: 'foo',
+                    scope: 'global'
                 },
                 url = helper.createLink(mockDoclet);
 
@@ -1310,7 +1549,7 @@ describe("jsdoc/util/templateHelper", function() {
                 },
                 url = helper.createLink(mockDoclet);
 
-            expect(url).toEqual('_.html#"*foo"');
+            expect(url).toEqual('ns1._!_.html#%22*foo%22');
         });
 
         it('should create a url for a function that is the only symbol exported by a module.',
@@ -1365,16 +1604,57 @@ describe("jsdoc/util/templateHelper", function() {
             expect(memberDocletUrl).toBe('module-qux.html#frozzle');
         });
 
-        it('should create a url for an empty package definition', function() {
-            var packageDoclet = {
-                kind: 'package',
-                name: undefined,
-                longname: 'package:undefined'
+        it('should include the scope punctuation in the fragment ID for static members', function() {
+            var functionDoclet = {
+                kind: 'function',
+                longname: 'Milk.pasteurize',
+                name: 'pasteurize',
+                memberof: 'Milk',
+                scope: 'static'
             };
+            var docletUrl = helper.createLink(functionDoclet);
 
-            var packageDocletUrl = helper.createLink(packageDoclet);
+            expect(docletUrl).toBe('Milk.html#.pasteurize');
+        });
 
-            expect(packageDocletUrl).toBe('global.html');
+        it('should include the scope punctuation in the fragment ID for inner members', function() {
+            var functionDoclet = {
+                kind: 'function',
+                longname: 'Milk~removeSticksAndLeaves',
+                name: 'removeSticksAndLeaves',
+                memberof: 'Milk',
+                scope: 'inner'
+            };
+            var docletUrl = helper.createLink(functionDoclet);
+
+            expect(docletUrl).toBe('Milk.html#~removeSticksAndLeaves');
+        });
+
+        it('should omit the scope punctuation from the fragment ID for instance members', function() {
+            var propertyDoclet = {
+                kind: 'member',
+                longname: 'Milk#calcium',
+                name: 'calcium',
+                memberof: 'Milk',
+                scope: 'instance'
+            };
+            var docletUrl = helper.createLink(propertyDoclet);
+
+            expect(docletUrl).toBe('Milk.html#calcium');
+        });
+
+        it('should include the variation, if present, in the fragment ID', function() {
+            var variationDoclet = {
+                kind: 'function',
+                longname: 'Milk#fat(percent)',
+                name: 'fat',
+                memberof: 'Milk',
+                scope: 'instance',
+                variation: '(percent)'
+            };
+            var docletUrl = helper.createLink(variationDoclet);
+
+            expect(docletUrl).toBe('Milk.html#fat(percent)');
         });
     });
 
@@ -1397,5 +1677,9 @@ describe("jsdoc/util/templateHelper", function() {
                 out = helper.resolveAuthorLinks(str);
             expect(out).toBe(helper.htmlsafe(str));
         });
+    });
+
+    xdescribe('longnamesToTree', function() {
+        // TODO
     });
 });

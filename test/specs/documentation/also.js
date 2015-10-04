@@ -1,7 +1,10 @@
-/*global describe, expect, it, jasmine, spyOn */
-describe("multiple doclets per symbol", function() {
+'use strict';
+
+var env = require('jsdoc/env');
+
+describe('multiple doclets per symbol', function() {
     function undocumented($) {
-        return ! $.undocumented;
+        return !($.undocumented);
     }
 
     function checkInequality(doclets, property) {
@@ -49,7 +52,7 @@ describe("multiple doclets per symbol", function() {
         'option is set to false, the file can be parsed without errors.', function() {
         var logger = require('jsdoc/util/logger');
 
-        var allowUnknownTags = !!global.env.conf.tags.allowUnknownTags;
+        var allowUnknownTags = !!env.conf.tags.allowUnknownTags;
         var docs;
         var errors = [];
 
@@ -58,12 +61,12 @@ describe("multiple doclets per symbol", function() {
         }
 
         logger.addListener('logger:error', errorListener);
-        global.env.conf.tags.allowUnknownTags = false;
+        env.conf.tags.allowUnknownTags = false;
 
         docs = jasmine.getDocSetFromFile('test/fixtures/also2.js');
         expect(errors[0]).not.toBeDefined();
 
         logger.removeListener('logger:error', errorListener);
-        global.env.conf.tags.allowUnknownTags = allowUnknownTags;
+        env.conf.tags.allowUnknownTags = allowUnknownTags;
     });
 });

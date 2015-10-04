@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint spaced-comment: 0 */
+
 exports.handlers = {
     ///
     /// Convert ///-style comments into jsdoc comments.
@@ -15,7 +17,7 @@ exports.handlers = {
     beforeParse: function(e) {
         e.source = e.source.replace(/(\n[ \t]*\/\/\/[^\n]*)+/g, function($) {
             var replacement = '\n/**' + $.replace(/^[ \t]*\/\/\//mg, '').replace(/(\n$|$)/, '*/$1');
-            return  replacement;
+            return replacement;
         });
     }
 };

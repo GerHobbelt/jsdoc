@@ -1,4 +1,3 @@
-/*global describe: true, expect: true, it: true, jasmine: true */
 'use strict';
 
 describe('jsdoc/tag/inline', function() {
@@ -178,7 +177,9 @@ describe('jsdoc/tag/inline', function() {
             }
 
             var result = jsdoc.tag.inline.replaceInlineTag('some {@foo text} with multiple ' +
-                '{@foo tags}', 'foo', replacer);
+                '{@foo tags}, {@foo like} {@foo this}', 'foo', replacer);
+
+            expect(result.tags.length).toBe(4);
 
             expect(result.tags[0]).toBeDefined();
             expect(typeof result.tags[0]).toBe('object');
@@ -190,9 +191,18 @@ describe('jsdoc/tag/inline', function() {
             expect(result.tags[1].tag).toBe('foo');
             expect(result.tags[1].text).toBe('tags');
 
-            expect(result.newString).toBe('some stuff with multiple stuff');
-        });
+            expect(result.tags[2]).toBeDefined();
+            expect(typeof result.tags[2]).toBe('object');
+            expect(result.tags[2].tag).toBe('foo');
+            expect(result.tags[2].text).toBe('like');
 
+            expect(result.tags[3]).toBeDefined();
+            expect(typeof result.tags[3]).toBe('object');
+            expect(result.tags[3].tag).toBe('foo');
+            expect(result.tags[3].text).toBe('this');
+
+            expect(result.newString).toBe('some stuff with multiple stuff, stuff stuff');
+        });
     });
 
     // largely covered by the replaceInlineTag tests
@@ -217,7 +227,6 @@ describe('jsdoc/tag/inline', function() {
 
             var result = jsdoc.tag.inline.replaceInlineTags(text, replacers);
             expect(result.newString).toBe('some stuff with {@bar multiple} tags');
-
         });
 
         it('should work with an object with multiple replacers', function() {

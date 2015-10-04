@@ -1,6 +1,6 @@
 JSDoc 3
 =======
-[![Build Status](https://img.shields.io/travis/jsdoc3/jsdoc.svg)](http://travis-ci.org/jsdoc3/jsdoc)
+[![Build Status](https://travis-ci.org/jsdoc3/jsdoc.svg?branch=master)](http://travis-ci.org/jsdoc3/jsdoc)
 
 An API documentation generator for JavaScript.
 
@@ -21,18 +21,13 @@ supports Node.js 0.10 and later.
 You can install JSDoc in your project's `node_modules` folder, or you can
 install it globally.
 
-To install the latest alpha version:
+To install the latest version available on NPM:
 
-    npm install jsdoc@"<=3.3.0"
+    npm install jsdoc
 
 To install the latest development version:
 
     npm install git+https://github.com/jsdoc3/jsdoc.git
-
-**Note**: If you install JSDoc globally, do not use `sudo npm install`. This may
-prevent you from running JSDoc as a normal user. If you cannot install global
-packages without `sudo`, please
-[fix your npm directory permissions](http://howtonode.org/introduction-to-npm).
 
 #### Running JSDoc with Node.js
 
@@ -105,6 +100,7 @@ generate and customize your documentation. Here are just a few:
 + [DocStrap](https://github.com/terryweiss/docstrap)
 + [jsdoc3Template](https://github.com/DBCDK/jsdoc3Template)
   ([example](https://github.com/danyg/jsdoc3Template/wiki#wiki-screenshots))
++ [minami](https://github.com/Nijikokun/minami)
 
 ### Build Tools
 
@@ -115,15 +111,16 @@ generate and customize your documentation. Here are just a few:
 For More Information
 --------------------
 
-Project Documentation: <http://usejsdoc.org/>  
-Project Documentation Source: <https://github.com/jsdoc3/jsdoc3.github.com>  
-JSDoc User's Group: <http://groups.google.com/group/jsdoc-users>  
-Project Announcements: <http://twitter.com/jsdoc3>
++ Documentation is available at [Use JSDoc](http://usejsdoc.org).
++ Contribute to the docs at [jsdoc3/jsdoc3.github.com](https://github.com/jsdoc3/jsdoc3.github.com).
++ Ask for help on the [JSDoc Users mailing list](http://groups.google.com/group/jsdoc-users).
++ Post questions tagged `jsdoc` to [Stack
+Overflow](http://stackoverflow.com/questions/tagged/jsdoc).
 
 License
 -------
 
-JSDoc 3 is copyright (c) 2011-2014 Michael Mathews <micmath@gmail.com> and the
+JSDoc 3 is copyright (c) 2011-2015 Michael Mathews <micmath@gmail.com> and the
 [contributors to JSDoc](https://github.com/jsdoc3/jsdoc/graphs/contributors).
 
 JSDoc 3 is free software, licensed under the Apache License, Version 2.0. See

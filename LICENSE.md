@@ -4,7 +4,7 @@ JSDoc 3 is free software, licensed under the Apache License, Version 2.0 (the
 "License"). Commercial and non-commercial use are permitted in compliance with
 the License.
 
-Copyright (c) 2011-2014 Michael Mathews <micmath@gmail.com> and the
+Copyright (c) 2011-2015 Michael Mathews <micmath@gmail.com> and the
 [contributors to JSDoc](https://github.com/jsdoc3/jsdoc/graphs/contributors).
 All rights reserved.
 
@@ -77,11 +77,21 @@ Copyright (c) 2010 Caolan McMahon.
 The source code for Async.js is available at:
 https://github.com/caolan/async
 
+## buffer-browserify ##
+
+buffer-browserify is distributed under the MIT license, which is reproduced
+above.
+
+Copyright (c) Romain Beauxis.
+
+The source code for buffer-browserify is available at:
+https://github.com/toots/buffer-browserify
+
 ## Catharsis ##
 
 Catharsis is distributed under the MIT license, which is reproduced above.
 
-Copyright (c) 2012-2013 Jeff Williams.
+Copyright (c) 2012-2014 Jeff Williams.
 
 The source code for Catharsis is available at:
 https://github.com/hegemonic/catharsis
@@ -96,9 +106,19 @@ Copyright (c) 2013 Dominic Tarr.
 The source code for crypto-browserify is available at:
 https://github.com/dominictarr/crypto-browserify
 
-## Esprima ##
+## escape-string-regexp ##
 
-Esprima is distributed under the BSD 2-clause license:
+escape-string-regexp is distributed under the MIT License, which is reproduced
+above.
+
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com>.
+
+The source code for escape-string-regexp is available at:
+https://github.com/sindresorhus/escape-string-regexp
+
+## Espree ##
+
+Espree is distributed under the BSD 2-clause license:
 
 > Redistribution and use in source and binary forms, with or without
 > modification, are permitted provided that the following conditions are met:
@@ -120,10 +140,23 @@ Esprima is distributed under the BSD 2-clause license:
 > (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 > THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Copyright (c) 2011-2013 Ariya Hidayat and other Esprima contributors.
+Copyright (c) 2011-2015 by the Espree contributors.
 
 The source code for Esprima is available at:
-https://github.com/ariya/esprima
+https://github.com/eslint/espree
+
+## events ##
+
+Portions of the events source code are incorporated into the following files:
+
++ `rhino/events.js`
+
+events is distributed under the MIT license, which is reproduced above.
+
+Copyright Joyent, Inc. and other Node contributors. All rights reserved.
+
+The source code for events is available at:
+https://github.com/Gozala/events
 
 ## github-flavored-markdown ##
 
@@ -193,44 +226,13 @@ https://github.com/mhevery/jasmine-node
 
 ## js2xmlparser ##
 
-js2xmlparser is distributed under the MIT license, which is reproduced above.
+js2xmlparser is distributed under the Apache License 2.0, which is
+included with this package.
 
 Copyright (c) 2012 Michael Kourlas.
 
 The source code for js2xmlparser is available at:
 https://github.com/michaelkourlas/node-js2xmlparser
-
-## JSHint ##
-
-JSHint is distributed under the MIT license, which is reproduced above.
-
-Portions of JSHint are derived from JSLint, which is distributed under a
-modified MIT license:
-
-> Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
->
-> Permission is hereby granted, free of charge, to any person obtaining a copy
-> of this software and associated documentation files (the "Software"), to deal
-> in the Software without restriction, including without limitation the rights
-> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> copies of the Software, and to permit persons to whom the Software is
-> furnished to do so, subject to the following conditions:
->
-> The above copyright notice and this permission notice shall be included in all
-> copies or substantial portions of the Software.
->
-> The Software shall be used for Good, not Evil.
->
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> SOFTWARE.
-
-The source code for JSHint is available at:
-https://github.com/jshint/jshint
 
 ## Node.js ##
 
@@ -262,17 +264,25 @@ above.
 The source code for node-browser-builtins is available at:
 https://github.com/alexgorbatchev/node-browser-builtins
 
-## node-browserify ##
+## Open Sans ##
 
-Portions of the node-browserify source code are incorporated into the following
-files:
+Open Sans is distributed under the Apache License 2.0, which is
+included with this package.
 
-- `rhino/events.js`
+Copyright (c) 2010-2011, Google Inc.
 
-node-browserify is distributed under the MIT license, which is reproduced above.
+This typeface, including the complete set of variations, are available at:
+http://www.google.com/fonts/specimen/Open+Sans
 
-The source code for node-browserify is available at:
-https://github.com/substack/node-browserify
+## Requizzle ##
+
+Requizzle is distributed under the MIT license, which is reproduced above.
+
+Copyright (c) 2014 Google Inc. All rights reserved.
+Copyright (c) 2012-2013 Johannes Ewald.
+
+The source code for Requizzle is available at:
+https://github.com/hegemonic/requizzle
 
 ## Rhino ##
 
@@ -365,11 +375,20 @@ https://github.com/geraintluff/tv4
 
 Underscore.js is distributed under the MIT license, which is reproduced above.
 
-Copyright (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative
+Copyright (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative
 Reporters & Editors.
 
 The source code for Underscore.js is available at:
 https://github.com/jashkenas/underscore
+
+## url ##
+
+url is distributed under the MIT license, which is reproduced above.
+
+Copyright Joyent, Inc. and other Node contributors.
+
+The source code for url is available at:
+https://github.com/defunctzombie/node-url
 
 ## wrench-js ##
 

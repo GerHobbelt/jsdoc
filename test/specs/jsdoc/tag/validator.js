@@ -1,8 +1,8 @@
-/*global afterEach, beforeEach, describe, env, expect, it, spyOn */
 'use strict';
 
 describe('jsdoc/tag/validator', function() {
     var doop = require('jsdoc/util/doop');
+    var env = require('jsdoc/env');
     var logger = require('jsdoc/util/logger');
     var tag = require('jsdoc/tag');
     var validator = require('jsdoc/tag/validator');
@@ -31,8 +31,8 @@ describe('jsdoc/tag/validator', function() {
         var goodTag = new tag.Tag('name', 'MyDocletName', meta); // mustHaveValue
         var goodTag2 = new tag.Tag('ignore', '', meta); // mustNotHaveValue
 
-        function validateTag(tag) {
-            validator.validate(tag, dictionary.lookUp(tag.title), meta);
+        function validateTag(theTag) {
+            validator.validate(theTag, dictionary.lookUp(theTag.title), meta);
         }
 
         beforeEach(function() {

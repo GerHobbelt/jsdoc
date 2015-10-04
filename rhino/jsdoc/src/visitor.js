@@ -2,18 +2,23 @@
 'use strict';
 
 // TODO: docs
-var Visitor = exports.Visitor = function(parser) {
+var Visitor = exports.Visitor = function() {
     var runtime = require('jsdoc/util/runtime');
     if ( !runtime.isRhino() ) {
         throw new Error('You must run JSDoc on Mozilla Rhino to use the Rhino node visitor.');
     }
 
-    Visitor.super_.call(this, parser);
+    Visitor.super_.call(this);
 
     // Rhino node visitors added by plugins (deprecated in JSDoc 3.3)
     this._rhinoNodeVisitors = [];
     // Rhino nodes retrieved from the org.jsdoc.AstBuilder instance
     this._rhinoNodes = null;
+
+    // only visit nodes, not their comments--the parser visits all the comments at once
+    this._visitors = [
+        this.visitNode
+    ];
 
     this.addAstNodeVisitor({
         visitNode: this._visitRhinoNode.bind(this)
@@ -27,6 +32,14 @@ Visitor.prototype.addRhinoNodeVisitor = function(visitor) {
 };
 
 // TODO: docs (deprecated)
+Visitor.prototype.removeRhinoNodeVisitor = function(visitor) {
+    var idx = this._rhinoNodeVisitors.indexOf(visitor);
+    if (idx !== -1) {
+        this._rhinoNodeVisitors.splice(idx, 1);
+    }
+};
+
+// TODO: docs (deprecated)
 Visitor.prototype.getRhinoNodeVisitors = function() {
     return this._rhinoNodeVisitors;
 };
@@ -34,9 +47,8 @@ Visitor.prototype.getRhinoNodeVisitors = function() {
 // TODO: docs (deprecated)
 Visitor.prototype._visitRhinoNode = function(astNode, e, parser, filename) {
     var rhinoNode;
-
     var visitors = this._rhinoNodeVisitors;
-    // if there are no visitors, bail out before we retrieve all the nodes
+
     if (!visitors.length) {
         return;
     }

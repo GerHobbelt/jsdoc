@@ -1,4 +1,5 @@
-/*global env: true, Packages: true */
+/*global java, Packages, version */
+/*eslint-disable strict */
 /**
  * @overview A minimal emulation of the standard features of Node.js necessary
  * to get JSDoc to run.
@@ -122,7 +123,7 @@ global.console = (function() {
  */
 global.process = {
     // not quite right, but close enough
-    argv: ['java', env.dirname + '/jsdoc.js']
+    argv: ['java', 'jsdoc.js']
         .concat( Array.prototype.slice.call(arguments, 0) ),
     // this depends on a hack in our version of Rhino
     cwd: function cwd() {
@@ -130,14 +131,14 @@ global.process = {
         return String( f.getAbsolutePath() );
     },
     env: (function() {
+        var javaEnv = java.lang.System.getenv();
+        var key;
+        var keys = javaEnv.keySet().toArray();
         var result = {};
 
-        var env = java.lang.System.getenv();
-        var keys = env.keySet().toArray();
-        var key;
-        for (var i = 0, l = keys.length; i < l; i++) {
+         for (var i = 0, l = keys.length; i < l; i++) {
             key = keys[i];
-            result[key + ''] = env.get(key) + '';
+            result[key + ''] = javaEnv.get(key) + '';
         }
 
         return result;
@@ -149,6 +150,15 @@ global.process = {
     nextTick: function nextTick(callback) {
         setTimeout(callback, 0);
     },
+    platform: (function() {
+        if ( String(java.lang.System.getProperty('os.name')).match(/^[Ww]in/) ) {
+            return 'win32';
+        }
+        else {
+            // not necessarily accurate, but good enough
+            return 'linux';
+        }
+    })(),
     stderr: {
         // Java can't reliably find the terminal width across platforms, so we hard-code a
         // reasonable value

@@ -1,32 +1,30 @@
 {
   "name": "jsdoc",
-  "version": "3.3.0-dev",
-  "revision": "1401234887184",
+  "version": "3.4.0-dev",
+  "revision": "1434307747571",
   "description": "An API documentation generator for JavaScript.",
   "keywords": [
     "documentation",
     "javascript"
   ],
-  "licenses": [
-    {
-      "type": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0"
-    }
-  ],
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/jsdoc3/jsdoc"
   },
   "dependencies": {
     "async": "~1.4.2",
+    "bluebird": "~2.10.2",
     "catharsis": "~0.8.7",
-    "esprima": "https://github.com/ariya/esprima/tarball/49a2eccb243f29bd653b11e9419241a9d726af7c",
+    "escape-string-regexp": "~1.0.3",
+    "espree": "~2.2.5",
     "js2xmlparser": "~1.0.0",
     "marked": "~0.3.5",
-    "taffydb": "https://github.com/hegemonic/taffydb/tarball/master",
+    "requizzle": "~0.2.1",
+    "strip-json-comments": "~1.0.4",
+    "taffydb": "https://github.com/hegemonic/taffydb/tarball/7d100bcee0e997ee4977e273cdce60bd8933050e",
     "underscore": "~1.8.3",
-    "wrench": "~1.5.8",
-    "fs-extra": "~0.24.0"
+    "wrench": "~1.5.8"
   },
   "devDependencies": {
     "gulp": "~3.9.0",
@@ -39,8 +37,7 @@
     "node": ">=0.10"
   },
   "scripts": {
-    "postinstall": "node ./node/postinstall.js",
-    "test": "gulp test"
+    "test": "gulp lint; gulp test"
   },
   "bin": {
     "jsdoc": "./jsdoc.js"

@@ -1,4 +1,3 @@
-/*global env: true */
 /**
  * @overview Dump information about parser events to the console.
  * @module plugins/eventDumper
@@ -7,6 +6,8 @@
 'use strict';
 
 var _ = require('underscore');
+var dump = require('jsdoc/util/dumper').dump;
+var env = require('jsdoc/env');
 var util = require('util');
 
 var conf = env.conf.eventDumper || {};
@@ -107,9 +108,9 @@ exports.handlers = {};
 
 events.forEach(function(eventType) {
     exports.handlers[eventType] = function(e) {
-        console.log( JSON.stringify({
+        console.log( dump({
             type: eventType,
             content: cleanse(e)
-        }, null, 4) );
+        }) );
     };
 });

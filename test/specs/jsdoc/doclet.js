@@ -1,18 +1,26 @@
-/*global describe: true, env: true, expect: true, it: true, jasmine: true */
-describe("jsdoc/doclet", function() {
+'use strict';
+
+describe('jsdoc/doclet', function() {
     // TODO: more tests
+    var _ = require('underscore');
     var Doclet = require('jsdoc/doclet').Doclet;
 
-    var docSet = jasmine.getDocSetFromFile('test/fixtures/doclet.js'),
-        test1 = docSet.getByLongname('test1')[0],
-        test2 = docSet.getByLongname('test2')[0];
+    var docSet = jasmine.getDocSetFromFile('test/fixtures/doclet.js');
+    var test1 = docSet.getByLongname('test1')[0];
+    var test2 = docSet.getByLongname('test2')[0];
 
-    var expectStrong = "**Strong** is strong";
-    var expectList = "* List item 1";
+    var expectList = '* List item 1';
+    var expectStrong = '**Strong** is strong';
 
     it('does not mangle Markdown in a description that uses leading asterisks', function() {
-        expect(test2.description.indexOf(expectStrong)).toBeGreaterThan(-1);
         expect(test2.description.indexOf(expectList)).toBeGreaterThan(-1);
+        expect(test2.description.indexOf(expectStrong)).toBeGreaterThan(-1);
+    });
+
+    it('adds the AST node as a non-enumerable property', function() {
+        var descriptor = Object.getOwnPropertyDescriptor(test1.meta.code, 'node');
+
+        expect(descriptor.enumerable).toBe(false);
     });
 
     describe('setScope', function() {
@@ -22,7 +30,7 @@ describe("jsdoc/doclet", function() {
                 doclet.setScope(scopeName);
             }
 
-            Object.keys(require('jsdoc/name').SCOPE_NAMES).forEach(function(scopeName) {
+            _.values(require('jsdoc/name').SCOPE.NAMES).forEach(function(scopeName) {
                 expect( setScope.bind(null, scopeName) ).not.toThrow();
             });
         });

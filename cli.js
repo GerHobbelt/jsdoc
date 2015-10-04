@@ -1,5 +1,5 @@
-/*global java */
-/*eslint no-process-exit:0 */
+/* global java */
+/* eslint no-process-exit:0, strict: [2, "function"] */
 /**
  * Helper methods for running JSDoc on the command line.
  *
@@ -16,7 +16,11 @@
 module.exports = (function() {
 'use strict';
 
+var app = require('jsdoc/app');
+var env = require('jsdoc/env');
 var logger = require('jsdoc/util/logger');
+var stripJsonComments = require('strip-json-comments');
+var Promise = require('bluebird');
 
 var hasOwnProp = Object.prototype.hasOwnProperty;
 
@@ -26,9 +30,6 @@ var props = {
     shouldExitWithError: false,
     tmpdir: null
 };
-
-var app = global.app;
-var env = global.env;
 
 var FATAL_ERROR_MESSAGE = 'Exiting JSDoc because an error occurred. See the previous log ' +
     'messages for details.';
@@ -70,7 +71,10 @@ cli.loadConfig = function() {
         env.opts = args.parse(env.args);
     }
     catch (e) {
-        cli.exit(1, e.message + '\n' + FATAL_ERROR_MESSAGE);
+        console.error(e.message + '\n');
+        cli.printHelp().then(function () {
+            cli.exit(1);
+        });
     }
 
     confPath = env.opts.configure || path.join(env.dirname, 'conf.json');
@@ -86,7 +90,7 @@ cli.loadConfig = function() {
     }
 
     try {
-        env.conf = new Config( fs.readFileSync(confPath, 'utf8') )
+        env.conf = new Config( stripJsonComments(fs.readFileSync(confPath, 'utf8')) )
             .get();
     }
     catch (e) {
@@ -163,15 +167,6 @@ cli.runCommand = function(cb) {
 
     var opts = env.opts;
 
-    function done(errorCode) {
-        if (!errorCode && props.shouldExitWithError) {
-            cb(1);
-        }
-        else {
-            cb(errorCode);
-        }
-    }
-
     if (opts.help) {
         cmd = cli.printHelp;
     }
@@ -185,27 +180,30 @@ cli.runCommand = function(cb) {
         cmd = cli.main;
     }
 
-    cmd(done);
+    cmd().then(function (errorCode) {
+        if (!errorCode && props.shouldExitWithError) {
+            errorCode = 1;
+        }
+        cb(errorCode);
+    });
 };
 
 // TODO: docs
-cli.printHelp = function(cb) {
+cli.printHelp = function() {
     cli.printVersion();
     console.log( '\n' + require('jsdoc/opts/args').help() + '\n' );
     console.log('Visit http://usejsdoc.org for more information.');
-    cb(0);
+    return Promise.resolve(0);
 };
 
 // TODO: docs
-cli.runTests = function(cb) {
+cli.runTests = function() {
     var path = require('jsdoc/path');
 
-    var runner = require( path.join(env.dirname, 'test/runner') );
+    var runner = Promise.promisify(require( path.join(env.dirname, 'test/runner') ));
 
     console.log('Running tests...');
-    runner(function(failCount) {
-        cb(failCount);
-    });
+    return runner();
 };
 
 // TODO: docs
@@ -214,138 +212,91 @@ cli.getVersion = function() {
 };
 
 // TODO: docs
-cli.printVersion = function(cb) {
+cli.printVersion = function() {
     console.log( cli.getVersion() );
-
-    if (cb) {
-        cb(0);
-    }
+    return Promise.resolve(0);
 };
 
 // TODO: docs
-cli.main = function(cb) {
+cli.main = function() {
     cli.scanFiles();
 
-    if (env.sourceFiles.length) {
-        cli.createParser()
-            .parseFiles()
-            .processParseResults();
-    }
-    else {
+    if (env.sourceFiles.length === 0) {
         console.log('There are no input files to process.\n');
-        cli.printHelp(cb);
+        return cli.printHelp();
+    } else {
+        return cli.createParser()
+            .parseFiles()
+            .processParseResults()
+            .then(function () {
+                env.run.finish = new Date();
+                return 0;
+            });
     }
-
-    env.run.finish = new Date();
-    cb(0);
 };
 
-function getRandomId() {
-    var MIN = 100000;
-    var MAX = 999999;
-
-    return Math.floor(Math.random() * (MAX - MIN + 1) + MIN);
-}
-
-// TODO: docs
-function createTempDir() {
+function readPackageJson(filepath) {
     var fs = require('jsdoc/fs');
-    var path = require('jsdoc/path');
-    var wrench = require('wrench');
-
-    var isRhino;
-    var tempDirname;
-    var tempPath;
-
-    // We only need one temp directory
-    if (props.tmpdir) {
-        return props.tmpdir;
-    }
-
-    isRhino = require('jsdoc/util/runtime').isRhino();
-    tempDirname = 'tmp-' + Date.now() + '-' + getRandomId();
-    tempPath = path.join(env.dirname, tempDirname);
 
     try {
-        fs.mkdirSync(tempPath);
-        props.tmpdir = tempPath;
+        return stripJsonComments( fs.readFileSync(filepath, 'utf8') );
     }
     catch (e) {
-        logger.fatal('Unable to create the temp directory %s: %s', tempPath, e.message);
-        return null;
-    }
-
-    try {
-        // Delete the temp directory on exit
-        if (isRhino) {
-            ( new java.io.File(tempPath) ).deleteOnExit();
-        }
-        else {
-            process.on('exit', function() {
-                wrench.rmdirSyncRecursive(tempPath);
-            });
-        }
-
-        return tempPath;
-    }
-    catch (e) {
-        logger.error('Cannot automatically delete the temp directory %s on exit: %s', tempPath,
-            e.message);
+        logger.error('Unable to read the package file "%s"', filepath);
         return null;
     }
 }
 
-// TODO: docs
-function copyResourceDir(filepath) {
+function buildSourceList() {
     var fs = require('jsdoc/fs');
-    var path = require('jsdoc/path');
-    var wrench = require('wrench');
+    var Readme = require('jsdoc/readme');
 
-    var resourceDir;
-    var tmpDir;
+    var packageJson;
+    var readmeHtml;
+    var sourceFile;
+    var sourceFiles = env.opts._ ? env.opts._.slice(0) : [];
 
-    try {
-        tmpDir = createTempDir();
-        resourceDir = path.join( tmpDir, path.basename(filepath) + '-' + getRandomId() );
-        fs.mkdirSync(resourceDir);
-
-        wrench.copyDirSyncRecursive(filepath, resourceDir);
-        return resourceDir;
+    if (env.conf.source && env.conf.source.include) {
+        sourceFiles = sourceFiles.concat(env.conf.source.include);
     }
-    catch (e) {
-        logger.fatal('Unable to copy %s to the temp directory %s: %s', filepath, resourceDir,
-            e.message);
-        return null;
+
+    // load the user-specified package/README files, if any
+    if (env.opts.package) {
+        packageJson = readPackageJson(env.opts.package);
     }
+    if (env.opts.readme) {
+        readmeHtml = new Readme(env.opts.readme).html;
+    }
+
+    // source files named `package.json` or `README.md` get special treatment, unless the user
+    // explicitly specified a package and/or README file
+    for (var i = 0, l = sourceFiles.length; i < l; i++) {
+        sourceFile = sourceFiles[i];
+
+        if ( !env.opts.package && /\bpackage\.json$/i.test(sourceFile) ) {
+            packageJson = readPackageJson(sourceFile);
+            sourceFiles.splice(i--, 1);
+        }
+
+        if ( !env.opts.readme && /(\bREADME|\.md)$/i.test(sourceFile) ) {
+            readmeHtml = new Readme(sourceFile).html;
+            sourceFiles.splice(i--, 1);
+        }
+    }
+
+    props.packageJson = packageJson;
+    env.opts.readme = readmeHtml;
+
+    return sourceFiles;
 }
 
 // TODO: docs
 cli.scanFiles = function() {
     var Filter = require('jsdoc/src/filter').Filter;
-    var fs = require('jsdoc/fs');
-    var Readme = require('jsdoc/readme');
 
     var filter;
-    var opt;
 
-    if (env.conf.source && env.conf.source.include) {
-        env.opts._ = (env.opts._ || []).concat(env.conf.source.include);
-    }
-
-    // source files named `package.json` or `README.md` get special treatment
-    for (var i = 0, l = env.opts._.length; i < l; i++) {
-        opt = env.opts._[i];
-
-        if ( /\bpackage\.json$/i.test(opt) ) {
-            props.packageJson = fs.readFileSync(opt, 'utf8');
-            env.opts._.splice(i--, 1);
-        }
-
-        if ( /(\bREADME|\.md)$/i.test(opt) ) {
-            env.opts.readme = new Readme(opt).html;
-            env.opts._.splice(i--, 1);
-        }
-    }
+    env.opts._ = buildSourceList();
 
     // are there any files to scan and parse?
     if (env.conf.source && env.opts._.length) {
@@ -361,7 +312,6 @@ cli.scanFiles = function() {
 function resolvePluginPaths(paths) {
     var path = require('jsdoc/path');
 
-    var isNode = require('jsdoc/util/runtime').isNode();
     var pluginPaths = [];
 
     paths.forEach(function(plugin) {
@@ -372,10 +322,6 @@ function resolvePluginPaths(paths) {
         if (!pluginPath) {
             logger.error('Unable to find the plugin "%s"', plugin);
             return;
-        }
-        // On Node.js, the plugin needs to be inside the JSDoc directory
-        else if ( isNode && pluginPath.indexOf(global.env.dirname) !== 0 ) {
-            pluginPath = copyResourceDir(pluginPath);
         }
 
         pluginPaths.push( path.join(pluginPath, basename) );
@@ -417,10 +363,13 @@ cli.parseFiles = function() {
     packageDocs.files = env.sourceFiles || [];
     docs.push(packageDocs);
 
-    logger.debug('Adding inherited symbols...');
+    logger.debug('Indexing doclets...');
     borrow.indexAll(docs);
-    augment.addInherited(docs);
+    logger.debug('Adding inherited symbols, mixins, and interface implementations...');
+    augment.augmentAll(docs);
+    logger.debug('Adding borrowed doclets...');
     borrow.resolveBorrows(docs);
+    logger.debug('Post-processing complete.');
 
     app.jsdoc.parser.fireProcessingComplete(docs);
 
@@ -430,17 +379,16 @@ cli.parseFiles = function() {
 cli.processParseResults = function() {
     if (env.opts.explain) {
         cli.dumpParseResults();
+        return Promise.resolve();
     }
     else {
         cli.resolveTutorials();
-        cli.generateDocs();
+        return cli.generateDocs();
     }
-
-    return cli;
 };
 
 cli.dumpParseResults = function() {
-    global.dump(props.docs);
+    console.log(require('jsdoc/util/dumper').dump(props.docs));
 
     return cli;
 };
@@ -464,16 +412,8 @@ cli.generateDocs = function() {
     var template;
 
     env.opts.template = (function() {
-        var isNode = require('jsdoc/util/runtime').isNode();
         var publish = env.opts.template || 'templates/default';
         var templatePath = path.getResourcePath(publish);
-
-        if (templatePath && isNode) {
-            // On Node.js, the template needs to be inside the JSDoc folder
-            if (templatePath.indexOf(env.dirname) !== 0) {
-                templatePath = copyResourceDir(templatePath);
-            }
-        }
 
         // if we didn't find the template, keep the user-specified value so the error message is
         // useful
@@ -489,20 +429,20 @@ cli.generateDocs = function() {
 
     // templates should include a publish.js file that exports a "publish" function
     if (template.publish && typeof template.publish === 'function') {
-        logger.printInfo('Generating output files...');
-        template.publish(
+        logger.info('Generating output files...');
+        var publishPromise = template.publish(
             taffy(props.docs),
             env.opts,
             resolver.root
         );
-        logger.info('complete.');
+
+        return Promise.resolve(publishPromise);
     }
     else {
         logger.fatal(env.opts.template + ' does not export a "publish" function. Global ' +
             '"publish" functions are no longer supported.');
     }
-
-    return cli;
+    return Promise.resolve();
 };
 
 // TODO: docs
@@ -515,5 +455,4 @@ cli.exit = function(exitCode, message) {
 };
 
 return cli;
-
 })();
