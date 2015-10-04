@@ -1,9 +1,9 @@
 # Development-related files
 .tern-port
 coverage/
-node_modules/.bin
-node_modules/gulp*
-node_modules/istanbul
+
+# NPM install files
+node_modules/
 
 # User-specific files
 conf.json
@@ -11,3 +11,4 @@ conf.json
 # Generated files
 test/tutorials/out
 out/
+

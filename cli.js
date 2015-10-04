@@ -374,7 +374,7 @@ function resolvePluginPaths(paths) {
             return;
         }
         // On Node.js, the plugin needs to be inside the JSDoc directory
-        else if ( isNode && (pluginPath.indexOf(global.env.dirname) !== 0) ) {
+        else if ( isNode && pluginPath.indexOf(global.env.dirname) !== 0 ) {
             pluginPath = copyResourceDir(pluginPath);
         }
 
