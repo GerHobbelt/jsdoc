@@ -117,6 +117,7 @@ See detail in [templates/haruki](./templates/haruki)
 ### Build Tools
 
 + [JSDoc Grunt plugin](https://github.com/krampstudio/grunt-jsdoc)
++ [JSDoc Gulp plugin](https://github.com/jsBoot/gulp-jsdoc)
 + [JSDoc ant task](https://github.com/jannon/jsdoc3-ant-task)
 
 
