@@ -21,6 +21,14 @@ var view;
 
 var outdir = path.normalize(env.opts.destination);
 
+function renderView(template, data) {
+    return view.render(template, data);
+}
+
+function resolveLinksHelper(html) {
+    return helper.resolveLinks(html);
+}
+
 function find(spec) {
     return helper.find(data, spec);
 }
@@ -216,10 +224,10 @@ function generate(title, docs, filename, resolveLinks) {
     };
 
     var outpath = path.join(outdir, filename),
-        html = view.render('container.tmpl', docData);
+        html = renderView('container.tmpl', docData);
 
     if (resolveLinks) {
-        html = helper.resolveLinks(html); // turn {@link foo} into <a href="foodoc.html">foo</a>
+        html = resolveLinksHelper(html); // turn {@link foo} into <a href="foodoc.html">foo</a>
     }
 
     fs.writeFileSync(outpath, html, 'utf8');
@@ -239,7 +247,7 @@ function generateSourceFiles(sourceFiles, encoding) {
                 code: helper.htmlsafe( fs.readFileSync(sourceFiles[file].resolved, encoding) )
             };
         }
-        catch(e) {
+        catch (e) {
             logger.error('Error while generating source file %s: %s', file, e.message);
         }
 
@@ -635,10 +643,10 @@ exports.publish = function(taffyData, opts, tutorials) {
         };
 
         var tutorialPath = path.join(outdir, filename),
-            html = view.render('tutorial.tmpl', tutorialData);
+            html = renderView('tutorial.tmpl', tutorialData);
 
         // yes, you can use {@link} in tutorials too!
-        html = helper.resolveLinks(html); // turn {@link foo} into <a href="foodoc.html">foo</a>
+        html = resolveLinksHelper(html); // turn {@link foo} into <a href="foodoc.html">foo</a>
 
         fs.writeFileSync(tutorialPath, html, 'utf8');
     }
