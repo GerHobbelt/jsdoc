@@ -20,7 +20,7 @@ var util = require('util');
 var xml = require('js2xmlparser');
 
 var htmlsafe = helper.htmlsafe;
-//var linkto = helper.linkto;
+//var linkto = helper.linkto;            // protect ourselves from accidentally using this one directly without any tweaking...
 var resolveAuthorLinks = helper.resolveAuthorLinks;
 var scopeToPunc = helper.scopeToPunc;
 var hasOwnProp = Object.prototype.hasOwnProperty;
