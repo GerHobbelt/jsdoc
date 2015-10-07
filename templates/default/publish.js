@@ -417,7 +417,13 @@ exports.publish = function(taffyData, opts, tutorials) {
     // set up tutorials for helper
     helper.setTutorials(tutorials);
 
-    data = helper.prune(data);
+    data = helper.prune(data, conf.default.pruneFlags || {
+        keepUndocumented: true,
+        keepMarkedAsIgnore: true,
+        keepMembersOfAnonymous: true,
+        keepAllAccessLevels: true,
+        //keepEveryone: true
+    });
     data.sort('longname, version, since');
     helper.addEventListeners(data);
 
