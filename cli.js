@@ -370,17 +370,12 @@ cli.parseFiles = function() {
     docs.push(packageDocs);
 
     logger.debug('Indexing doclets...');
-    var fs = require("jsdoc/fs");
-    fs.writeFileSync(env.sourceFiles[0] + ".docletsdump.1.json", JSON.stringify(docs, null, 4), 'utf8');
     borrow.indexAll(docs);
     logger.debug('Adding inherited symbols, mixins, and interface implementations...');
-    fs.writeFileSync(env.sourceFiles[0] + ".docletsdump.2.json", JSON.stringify(docs, null, 4), 'utf8');
     augment.augmentAll(docs);
     logger.debug('Adding borrowed doclets...');
-    fs.writeFileSync(env.sourceFiles[0] + ".docletsdump.3.json", JSON.stringify(docs, null, 4), 'utf8');
     borrow.resolveBorrows(docs);
     logger.debug('Post-processing complete.');
-    fs.writeFileSync(env.sourceFiles[0] + ".docletsdump.4.json", JSON.stringify(docs, null, 4), 'utf8');
 
     app.jsdoc.parser.fireProcessingComplete(docs);
 
@@ -452,8 +447,6 @@ cli.generateDocs = function() {
     // templates should include a publish.js file that exports a "publish" function
     if (template.publish && typeof template.publish === 'function') {
         logger.info('Generating output files...');
-    var fs = require("jsdoc/fs");
-    fs.writeFileSync(env.sourceFiles[0] + ".generate.0.json", JSON.stringify(props, null, 4), 'utf8');
         var publishPromise = template.publish(
             taffy(props.docs),
             env.opts,
