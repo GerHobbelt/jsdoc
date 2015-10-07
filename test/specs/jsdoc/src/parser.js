@@ -283,8 +283,11 @@ describe('jsdoc/src/parser', function() {
                 eventObject = spy.mostRecentCall.args[0];
                 expect(eventObject).toBeDefined();
                 expect( Array.isArray(eventObject.sourcefiles) ).toBe(true);
+                expect( Array.isArray(eventObject.parsedfiles) ).toBe(true);
                 expect(eventObject.sourcefiles.length).toBe(1);
-                expect(eventObject.sourcefiles[0]).toBe('[[string0]]');
+                expect(eventObject.parsedfiles.length).toBe(1);
+                expect(eventObject.sourcefiles).toBe(sourceCode);
+                expect(eventObject.parsedfiles[0]).toBe('[[string0]]');
                 expect( Array.isArray(eventObject.doclets) ).toBe(true);
                 expect(eventObject.doclets.length).toBe(1);
                 expect(eventObject.doclets[0].kind).toBe('class');
