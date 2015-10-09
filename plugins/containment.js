@@ -15,7 +15,7 @@ exports.defineTags = function(dictionary) {
         canHaveType: false,
         canHaveName: false,
         onTagged: function(doclet, tag) {
-            console.log("STARTREGION: ", arguments);
+            // console.log("STARTREGION: ", arguments);
             doclet.startRegion = tag;
             // hack to make it get through in unpatched JSDoc 
             // doclet.name = doclet.name || '~~~startregion~~~';
@@ -28,11 +28,12 @@ exports.defineTags = function(dictionary) {
             // next function / namespace / ... into a single doclet!
             // 
             //     doclet.pushImmediately = true;
-            try {
-                throw new Error("kaboom!");
-            } catch (ex) {
-                console.log("stack: ", ex.stack);
-            } 
+
+            // try {
+            //     throw new Error("kaboom!");
+            // } catch (ex) {
+            //     console.log("stack: ", ex.stack);
+            // } 
         }
     });
     dictionary.defineTag('}', {
@@ -41,7 +42,7 @@ exports.defineTags = function(dictionary) {
         canHaveType: false,
         canHaveName: false,
         onTagged: function(doclet, tag) {
-            console.log("ENDREGION: ", arguments);
+            // console.log("ENDREGION: ", arguments);
             doclet.endRegion = tag;
             // hack to make it get through in unpatched JSDoc 
             // doclet.name = doclet.name || '~~~endregion~~~';
@@ -53,11 +54,12 @@ exports.defineTags = function(dictionary) {
 
             nestingLevel--;
             doclet.regionNestingLevel = nestingLevel;
-            try {
-                throw new Error("kaboom!");
-            } catch (ex) {
-                console.log("stack: ", ex.stack);
-            } 
+
+            // try {
+            //     throw new Error("kaboom!");
+            // } catch (ex) {
+            //     console.log("stack: ", ex.stack);
+            // } 
         }
     });
 };
@@ -68,7 +70,7 @@ exports.handlers = {
         given document node (namespace, class, ...) if they aren't already.
      */
     newDoclet: function(e) {
-        console.log("DOCLET: ", arguments);
+        // console.log("DOCLET: ", arguments);
         var tags = e.doclet.tags,
             tag,
             value;
@@ -81,7 +83,7 @@ exports.handlers = {
             });
 
             if (tags.length) {
-                console.log("region markers: ", tags);
+                // console.log("region markers: ", tags);
 
                 // // take the first one
                 // tag = tags[0];
@@ -94,6 +96,6 @@ exports.handlers = {
     },
 
     fileComplete: function(e) {
-        console.log("fileComplete: ", arguments);
+        // console.log("fileComplete: ", arguments);
     }
 };
