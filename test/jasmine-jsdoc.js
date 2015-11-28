@@ -1,4 +1,4 @@
-/*global expect, jasmine: true, runs, waits */
+/* global expect, jasmine: true, runs, waits */
 'use strict';
 
 var fs = require('jsdoc/fs');
@@ -13,9 +13,6 @@ var jsdoc = {
     src: {
         handlers: require('jsdoc/src/handlers'),
         parser: require('jsdoc/src/parser')
-    },
-    util: {
-        runtime: require('jsdoc/util/runtime')
     }
 };
 
@@ -40,9 +37,9 @@ jasmine.getParseResults = function() {
     return parseResults;
 };
 
-// use the requested parser, or default to the pure JS parser (on Node.js) or Rhino (on Rhino)
+// use the requested parser, or default to the pure JS parser (on Node.js)
 jasmine.jsParser = (function() {
-    var parser = jsdoc.util.runtime.isRhino() ? 'rhino' : 'js';
+    var parser = 'js';
 
     if (jsdoc.env.opts.query && jsdoc.env.opts.query.parser) {
         parser = jsdoc.env.opts.query.parser;
@@ -111,9 +108,9 @@ jasmine.executeSpecsInFolder = function(folder, done, opts) {
     // Add the specs to the context
     for (var i = 0, len = specsList.length; i < len; ++i) {
         filename = specsList[i];
-        require(filename.path().replace(/\\/g, '/').
-            replace(new RegExp('^' + jsdoc.env.dirname + '/test'), './').
-            replace(/\.\w+$/, ''));
+        require(filename.path().replace(/\\/g, '/')
+            .replace(new RegExp('^' + jsdoc.env.dirname + '/test'), './')
+            .replace(/\.\w+$/, ''));
     }
 
     // Run Jasmine
@@ -155,9 +152,9 @@ jasmine.getDocSetFromFile = function(filename, parser, validate, augment) {
 
     jsdoc.src.handlers.attachTo(testParser);
 
-    /*eslint-disable no-script-url */
+    /* eslint-disable no-script-url */
     doclets = testParser.parse('javascript:' + sourceCode);
-    /*eslint-enable no-script-url */
+    /* eslint-enable no-script-url */
     jsdoc.borrow.indexAll(doclets);
 
     if (augment !== false) {
