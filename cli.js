@@ -404,7 +404,7 @@ cli.resolveTutorials = function() {
 cli.generateDocs = function() {
     var path = require('jsdoc/path');
     var resolver = require('jsdoc/tutorial/resolver');
-    var taffy = require('taffydb-75lb').taffy;
+    var taffy = require('taffydb').taffy;
 
     var template;
 

@@ -3,6 +3,33 @@
 This file describes notable changes in each version of JSDoc 3. To download a specific version of JSDoc 3, see [GitHub's tags page](https://github.com/jsdoc3/jsdoc/tags).
 
 
+## 3.4.2 (October 2016)
+
++ Classes exported from an ES2015 module are now documented correctly. (#1137)
++ Fixed an issue that prevented plugins and templates from being loaded correctly. (#1259)
++ Fixed a crash when using the experimental object spread operator in assignments. (#1258)
+
+
+## 3.4.1 (September 2016)
+
+### Enhancements
++ When installing JSDoc from NPM, all dependencies are now pulled from NPM. (#961)
++ The configuration setting `tags.allowUnknownTags` may now contain an array of tag names that should be allowed. (#1159)
+
+### Bug fixes
++ When an ES2015 module's default export is a class, JSDoc now documents the class correctly. (#1113, #1120)
++ JSDoc no longer crashes when an ES2015 module exports an anonymous class. (#1113)
++ JSDoc no longer crashes when the experimental object spread operator is used. (#1141)
++ In ES2015 methods, JSDoc now autodetects whether a parameter is a default or repeatable parameter. (#1144)
++ The Markdown plugin now works correctly with inline tags that contain special characters, such as `{@link chat."#channel"}`. (#1035)
++ When JSDoc is run in a directory that has a `plugins/` or `templates/` directory, JSDoc can now discover plugins and templates in other directories. (#1081)
+
+### Templates
++ The default template now uses appropriate styles for displaying tables. (#1064)
++ The default template's CSS file no longer uses the same style for both `<h2>` and `<h3>` elements. (#1108)
++ JSDoc now includes a `silent` template that generates no output. This template makes it easier to use JSDoc as a linter to check for syntax errors and unrecognized tags in documentation comments. (#1160)
+
+
 ## 3.4.0 (November 2015)
 
 ### Major changes
