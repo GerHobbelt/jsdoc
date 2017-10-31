@@ -435,7 +435,12 @@ cli.generateDocs = function() {
         template = require(env.opts.template + '/publish');
     }
     catch (e) {
-        logger.fatal('Unable to load template: ' + e.message || e);
+        try {
+            template = require(env.opts.template);
+        }
+        catch (ee) {
+            logger.fatal('Unable to load template: ' + ee.message || ee);
+        }
     }
 
     // templates should include a publish.js file that exports a "publish" function
