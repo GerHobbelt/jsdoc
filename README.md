@@ -53,7 +53,7 @@ generate and customize your documentation. Here are just a few:
 + [jsdoc3Template](https://github.com/DBCDK/jsdoc3Template)
   ([example](https://github.com/danyg/jsdoc3Template/wiki#wiki-screenshots))
 + [minami](https://github.com/Nijikokun/minami)
-+ [docdash](https://github.com/clenemt/docdash)
++ [docdash](https://github.com/clenemt/docdash) ([example](http://clenemt.github.io/docdash/))
 
 ### Export JSON
 
@@ -65,11 +65,8 @@ See detail in [templates/haruki](./templates/haruki)
 
 ### Build Tools
 
-+ [JSDoc Ant task](https://github.com/jannon/jsdoc3-ant-task)
 + [JSDoc Grunt plugin](https://github.com/krampstudio/grunt-jsdoc)
 + [JSDoc Gulp plugin](https://github.com/mlucool/gulp-jsdoc3)
-+ [JSDoc ant task](https://github.com/jannon/jsdoc3-ant-task)
-
 
 For More Information
 --------------------
