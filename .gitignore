@@ -30,3 +30,5 @@ out/
 # Dotfile detritus
 .DS_Store
 
+# editor detritus
+*.bak
