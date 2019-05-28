@@ -116,7 +116,7 @@ describe('@param tag', () => {
     });
 
     describe('without names', function() {
-        var docSet3 = jasmine.getDocSetFromFile('test/fixtures/paramtag3.js');
+        var docSet3 = jsdoc.getDocSetFromFile('test/fixtures/paramtag3.js');
 
         it('When a @param tag is named and sits in-between two unnamed @param tags, the names will be taken in-order from the code', function() {
             var mixedNaming = docSet3.getByLongname('mixedNaming')[0];

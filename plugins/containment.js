@@ -203,7 +203,7 @@ exports.handlers = {
             if (doclet.regionMarkStart) {
                 region = stack[doclet.regionNestingLevel] = doclet;
 
-                x    
+                //x    
 
 
 
@@ -236,8 +236,5 @@ exports.handlers = {
         }
 
 
-            // hook 'member-of-anonymous' doclets up to the topmost region level:
-            if () 
-        }
     }
 };

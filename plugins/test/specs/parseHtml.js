@@ -1,6 +1,6 @@
 /*global describe: true, env: true, expect: true, it: true, jasmine: true */
 describe("parseHtml plugin", function() {
-    var parser = jasmine.createParser();
+    var parser = jsdoc.createParser();
     var path = require('jsdoc/path');
 
     var pluginPath = 'plugins/parseHtml';

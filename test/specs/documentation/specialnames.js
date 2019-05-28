@@ -13,8 +13,6 @@ describe('documenting symbols with special names', () => {
     it('When a symbol is named "constructor", its members are resolved correctly.', () => {
         expect(constructToString).toBeDefined();
     });
-    var proto = docSet.getByLongname('prototype')[0];
-    var protoValueOf = docSet.getByLongname('prototype.valueOf')[0];
 
     it('When a symbol is named "hasOwnProperty," the symbol should appear in the docs.', () => {
         expect(hasOwnProp).toBeDefined();

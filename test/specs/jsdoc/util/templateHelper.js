@@ -568,6 +568,7 @@ describe("jsdoc/util/templateHelper", () => {
         for (let i = 0, l = a.length; i < l; i++) {
             for (const prop in a[i]) {
                 if ( hasOwnProp.call(a[i], prop) ) {
+                    expect(b[i]).toBeDefined();
                     expect(b[i][prop]).toBeDefined();
                     expect(a[i][prop]).toEqual(b[i][prop]);
                 }
