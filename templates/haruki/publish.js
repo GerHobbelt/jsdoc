@@ -147,6 +147,40 @@ function graft(parentNode, childNodes, parentLongname, parentName) {
                 }
             }
         }
+        else if (element.kind === 'typedef') {
+            if (!parentNode.typedefs) {
+                parentNode.typedefs = [];
+            }
+
+            var thisTypedef = {
+                'name': element.name,
+                'description': element.description || '',
+                'properties': []
+            }
+
+            parentNode.typedefs.push(thisTypedef);
+
+            if (element.examples) {
+                for (i = 0, len = element.examples.length; i < len; i++) {
+                    thisTypedef.constructor.examples.push(element.examples[i]);
+                }
+            }
+
+            if (element.properties) {
+                for (i = 0, len = element.properties.length; i < len; i++) {
+                    thisTypedef.properties.push({
+                        'name': element.properties[i].name,
+                        'type': element.properties[i].type? (element.properties[i].type.names.length === 1? element.properties[i].type.names[0] : element.params[i].type.names) : '',
+                        'description': element.properties[i].description || '',
+                        'default': hasOwnProp.call(element.properties[i], 'defaultvalue') ? element.properties[i].defaultvalue : '',
+                        'optional': typeof element.properties[i].optional === 'boolean'? element.properties[i].optional : '',
+                        'nullable': typeof element.properties[i].nullable === 'boolean'? element.properties[i].nullable : ''
+                    });
+                }
+            }
+
+            graft(thisTypedef, childNodes, element.longname, element.name);
+        }
         else if (element.kind === 'class') {
             if (!parentNode.classes) {
                 parentNode.classes = [];
