@@ -6,7 +6,7 @@ var fs = require('jsdoc/fs');
 var helper = require('jsdoc/util/templateHelper');
 var logger = require('jsdoc/util/logger');
 var path = require('jsdoc/path');
-var taffy = require('taffydb-75lb').taffy;
+var taffy = require('taffydb').taffy;
 var template = require('jsdoc/template');
 var util = require('util');
 
@@ -20,14 +20,6 @@ var data;
 var view;
 
 var outdir = path.normalize(env.opts.destination);
-
-function renderView(template, data) {
-    return view.render(template, data);
-}
-
-function resolveLinksHelper(html) {
-    return helper.resolveLinks(html);
-}
 
 function find(spec) {
     return helper.find(data, spec);
@@ -224,10 +216,10 @@ function generate(title, docs, filename, resolveLinks) {
     };
 
     var outpath = path.join(outdir, filename),
-        html = renderView('container.tmpl', docData);
+        html = view.render('container.tmpl', docData);
 
     if (resolveLinks) {
-        html = resolveLinksHelper(html); // turn {@link foo} into <a href="foodoc.html">foo</a>
+        html = helper.resolveLinks(html); // turn {@link foo} into <a href="foodoc.html">foo</a>
     }
 
     fs.writeFileSync(outpath, html, 'utf8');
@@ -649,10 +641,10 @@ exports.publish = function(taffyData, opts, tutorials) {
         };
 
         var tutorialPath = path.join(outdir, filename),
-            html = renderView('tutorial.tmpl', tutorialData);
+            html = view.render('tutorial.tmpl', tutorialData);
 
         // yes, you can use {@link} in tutorials too!
-        html = resolveLinksHelper(html); // turn {@link foo} into <a href="foodoc.html">foo</a>
+        html = helper.resolveLinks(html); // turn {@link foo} into <a href="foodoc.html">foo</a>
 
         fs.writeFileSync(tutorialPath, html, 'utf8');
     }

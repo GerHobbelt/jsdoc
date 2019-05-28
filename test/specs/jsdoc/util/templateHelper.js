@@ -12,7 +12,7 @@ describe("jsdoc/util/templateHelper", function() {
     var helper = require('jsdoc/util/templateHelper');
     var logger = require('jsdoc/util/logger');
     var resolver = require('jsdoc/tutorial/resolver');
-    var taffy = require('taffydb-75lb').taffy;
+    var taffy = require('taffydb').taffy;
 
     helper.registerLink('test', 'path/to/test.html');
 
