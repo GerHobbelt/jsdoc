@@ -1,15 +1,12 @@
 /**
- * @overview Translate doclet descriptions from MarkDown into HTML.
+ * Translate doclet descriptions from Markdown into HTML.
+ *
  * @module plugins/markdown
- * @author Michael Mathews <micmath@gmail.com>
- * @author Ben Blank <ben.blank@gmail.com>
  */
-'use strict';
+const env = require('jsdoc/env');
 
-var env = require('jsdoc/env');
-
-var config = env.conf.markdown || {};
-var defaultTags = [
+const config = env.conf.markdown || {};
+const defaultTags = [
     'author',
     'classdesc',
     'description',
@@ -17,18 +14,19 @@ var defaultTags = [
     'params',
     'properties',
     'returns',
-    'see'
+    'see',
+    'summary'
 ];
-var hasOwnProp = Object.prototype.hasOwnProperty;
-var parse = require('jsdoc/util/markdown').getParser();
-var tags = [];
-var excludeTags = [];
+const hasOwnProp = Object.prototype.hasOwnProperty;
+const parse = require('jsdoc/util/markdown').getParser();
+let tags = [];
+let excludeTags = [];
 
 function shouldProcessString(tagName, text) {
-    var shouldProcess = true;
+    let shouldProcess = true;
 
     // we only want to process `@author` and `@see` tags that contain Markdown links
-    if ( (tagName === 'author' || tagName === 'see') && text.indexOf('[') === -1 ) {
+    if ( (tagName === 'author' || tagName === 'see') && !text.includes('[') ) {
         shouldProcess = false;
     }
 
@@ -36,13 +34,13 @@ function shouldProcessString(tagName, text) {
 }
 
 /**
- * Process the markdown source in a doclet. The properties that should be
- * processed are configurable, but always include "classdesc", "description",
- * "params", "properties", and "returns".  Handled properties can be bare
- * strings, objects, or arrays of objects.
+ * Process the markdown source in a doclet. The properties that should be processed are
+ * configurable, but always include "author", "classdesc", "description", "exceptions", "params",
+ * "properties",  "returns", and "see".  Handled properties can be bare strings, objects, or arrays
+ * of objects.
  */
 function process(doclet) {
-    tags.forEach(function(tag) {
+    tags.forEach(tag => {
         if ( !hasOwnProp.call(doclet, tag) ) {
             return;
         }
@@ -51,8 +49,9 @@ function process(doclet) {
             doclet[tag] = parse(doclet[tag]);
         }
         else if ( Array.isArray(doclet[tag]) ) {
-            doclet[tag].forEach(function(value, index, original) {
-                var inner = {};
+            doclet[tag].forEach((value, index, original) => {
+                const inner = {};
+
                 inner[tag] = value;
                 process(inner);
                 original[index] = inner[tag];
@@ -72,18 +71,18 @@ if (config.tags) {
 if (config.excludeTags) {
     excludeTags = config.excludeTags.slice();
 }
-defaultTags.forEach(function(tag) {
-    if (excludeTags.indexOf(tag) === -1 && tags.indexOf(tag) === -1) {
+defaultTags.forEach(tag => {
+    if (!excludeTags.includes(tag) && !tags.includes(tag)) {
         tags.push(tag);
     }
 });
 
 exports.handlers = {
     /**
-     * Translate markdown syntax in a new doclet's description into HTML. Is run
+     * Translate Markdown syntax in a new doclet's description into HTML. Is run
      * by JSDoc 3 whenever a "newDoclet" event fires.
      */
-    newDoclet: function(e) {
-        process(e.doclet);
+    newDoclet({doclet}) {
+        process(doclet);
     }
 };

@@ -1,12 +1,9 @@
+/* eslint-disable spaced-comment */
 /**
-    @overview Demonstrate how to modify the source code before the parser sees it.
-    @module plugins/commentConvert
-    @author Michael Mathews <micmath@gmail.com>
+ * Demonstrate how to modify the source code before the parser sees it.
+ *
+ * @module plugins/commentConvert
  */
-'use strict';
-
-/* eslint spaced-comment: 0 */
-
 exports.handlers = {
     ///
     /// Convert ///-style comments into jsdoc comments.
@@ -14,9 +11,10 @@ exports.handlers = {
     /// @param e.filename
     /// @param e.source
     ///
-    beforeParse: function(e) {
-        e.source = e.source.replace(/(\n[ \t]*\/\/\/[^\n]*)+/g, function($) {
-            var replacement = '\n/**' + $.replace(/^[ \t]*\/\/\//mg, '').replace(/(\n$|$)/, '*/$1');
+    beforeParse(e) {
+        e.source = e.source.replace(/(\n[ \t]*\/\/\/[^\n]*)+/g, $ => {
+            const replacement = `\n/**${$.replace(/^[ \t]*\/\/\//mg, '').replace(/(\n$|$)/, '*/$1')}`;
+
             return replacement;
         });
     }

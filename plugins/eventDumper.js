@@ -1,19 +1,17 @@
 /**
- * @overview Dump information about parser events to the console.
+ * Dump information about parser events to the console.
+ *
  * @module plugins/eventDumper
- * @author Jeff Williams <jeffrey.l.williams@gmail.com>
  */
-'use strict';
+const _ = require('lodash');
+const doop = require('jsdoc/util/doop');
+const dump = require('jsdoc/util/dumper').dump;
+const env = require('jsdoc/env');
 
-var _ = require('underscore');
-var dump = require('jsdoc/util/dumper').dump;
-var env = require('jsdoc/env');
-var util = require('util');
-
-var conf = env.conf.eventDumper || {};
+const conf = env.conf.eventDumper || {};
 
 // Dump the included parser events (defaults to all events)
-var events = conf.include || [
+let events = conf.include || [
     'parseBegin',
     'fileBegin',
     'beforeParse',
@@ -24,6 +22,7 @@ var events = conf.include || [
     'parseComplete',
     'processingComplete'
 ];
+
 // Don't dump the excluded parser events
 if (conf.exclude) {
     events = _.difference(events, conf.exclude);
@@ -36,9 +35,7 @@ if (conf.exclude) {
  * @return {Object} The modified object.
  */
 function replaceNodeObjects(o) {
-    var doop = require('jsdoc/util/doop');
-
-    var OBJECT_PLACEHOLDER = '<Object>';
+    const OBJECT_PLACEHOLDER = '<Object>';
 
     if (o.code && o.code.node) {
         // don't break the original object!
@@ -66,13 +63,13 @@ function replaceNodeObjects(o) {
  * @return {object} The fixed-up object.
  */
 function cleanse(e) {
-    var result = {};
+    let result = {};
 
-    Object.keys(e).forEach(function(prop) {
+    Object.keys(e).forEach(prop => {
         // by default, don't stringify properties that contain an array of functions
-        if (!conf.includeFunctions && util.isArray(e[prop]) && e[prop][0] &&
+        if (!conf.includeFunctions && Array.isArray(e[prop]) && e[prop][0] &&
             String(typeof e[prop][0]) === 'function') {
-            result[prop] = 'function[' + e[prop].length + ']';
+            result[prop] = `function[${e[prop].length}]`;
         }
         // never include functions that belong to the object
         else if (typeof e[prop] !== 'function') {
@@ -90,8 +87,8 @@ function cleanse(e) {
 
 exports.handlers = {};
 
-events.forEach(function(eventType) {
-    exports.handlers[eventType] = function(e) {
+events.forEach(eventType => {
+    exports.handlers[eventType] = e => {
         console.log( dump({
             type: eventType,
             content: cleanse(e)

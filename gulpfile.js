@@ -1,14 +1,9 @@
 /* eslint max-nested-callbacks: 0 */
-'use strict';
-
-var eslint = require('gulp-eslint');
-var exec = require('child_process').exec;
-var gulp = require('gulp');
-var istanbul = require('istanbul');
-var jsonEditor = require('gulp-json-editor');
-var os = require('os');
-var path = require('path');
-var util = require('util');
+const eslint = require('gulp-eslint');
+const exec = require('child_process').exec;
+const gulp = require('gulp');
+const jsonEditor = require('gulp-json-editor');
+const path = require('path');
 
 function execCb(cb, err, stdout, stderr) {
     console.log(stdout);
@@ -16,7 +11,7 @@ function execCb(cb, err, stdout, stderr) {
     cb(err);
 }
 
-var options = {
+const options = {
     coveragePaths: [
         '*.js',
         'lib/**/*.js',
@@ -34,29 +29,39 @@ var options = {
     nodePath: process.execPath
 };
 
-gulp.task('bump', function() {
+function bump(cb) {
     gulp.src('./package.json')
         .pipe(jsonEditor({
             revision: String( Date.now() )
         }))
         .pipe(gulp.dest('./'));
-});
 
-gulp.task('coverage', function(cb) {
-    var cmd = util.format('./node_modules/.bin/istanbul cover %s -- -T', options.nodeBin);
+    cb();
+}
+
+function coverage(cb) {
+    const cmd = `./node_modules/.bin/nyc --reporter=html ${options.nodeBin} -T`;
+
     exec(cmd, execCb.bind(null, cb));
-});
+}
 
-gulp.task('lint', function() {
-    return gulp.src(options.lintPaths)
+function lint(cb) {
+    gulp.src(options.lintPaths)
         .pipe(eslint())
         .pipe(eslint.formatEach())
         .pipe(eslint.failOnError());
-});
 
-gulp.task('test', function(cb) {
-    var cmd = util.format('"%s" "%s" -T', options.nodePath, options.nodeBin);
+    cb();
+}
+
+function test(cb) {
+    const cmd = `"${options.nodePath}" "${options.nodeBin}" -T`;
+
     exec(cmd, execCb.bind(null, cb));
-});
+}
 
-gulp.task('default', ['lint', 'test']);
+exports.bump = bump;
+exports.coverage = coverage;
+exports.default = gulp.series(lint, test);
+exports.lint = lint;
+exports.test = test;

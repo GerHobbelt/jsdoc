@@ -1,38 +1,37 @@
 #!/usr/bin/env node
-/* global arguments, require: true */
-/* eslint strict: [2, "function"] */
-/**
- * @project jsdoc
- * @author Michael Mathews <micmath@gmail.com>
- * @license See LICENSE.md file included in this distribution.
- */
+/* global require: true */
 
-// initialize the environment for the current JavaScript VM
-(function(args) {
-    'use strict';
+// initialize the environment for Node.js
+(() => {
+    const fs = require('fs');
+    const path = require('path');
 
-    var path;
+    let env;
+    let jsdocPath = __dirname;
+    const pwd = process.cwd();
 
-    if (args[0] && typeof args[0] === 'object') {
-        // we should be on Node.js
-        args = [__dirname, process.cwd()];
-        path = require('path');
+    // Create a custom require method that adds `lib/jsdoc` and `node_modules` to the module
+    // lookup path. This makes it possible to `require('jsdoc/foo')` from external templates and
+    // plugins, and within JSDoc itself. It also allows external templates and plugins to
+    // require JSDoc's module dependencies without installing them locally.
+    require = require('requizzle')({
+        requirePaths: {
+            before: [path.join(__dirname, 'lib')],
+            after: [path.join(__dirname, 'node_modules')]
+        },
+        infect: true
+    });
 
-        // Create a custom require method that adds `lib/jsdoc` and `node_modules` to the module
-        // lookup path. This makes it possible to `require('jsdoc/foo')` from external templates and
-        // plugins, and within JSDoc itself. It also allows external templates and plugins to
-        // require JSDoc's module dependencies without installing them locally.
-        require = require('requizzle')({
-            requirePaths: {
-                before: [path.join(__dirname, 'lib')],
-                after: [path.join(__dirname, 'node_modules')]
-            },
-            infect: true
-        });
+    // resolve the path if it's a symlink
+    if ( fs.statSync(jsdocPath).isSymbolicLink() ) {
+        jsdocPath = path.resolve( path.dirname(jsdocPath), fs.readlinkSync(jsdocPath) );
     }
 
-    require('./lib/jsdoc/util/runtime').initialize(args);
-})( Array.prototype.slice.call(arguments, 0) );
+    env = require('./lib/jsdoc/env');
+    env.dirname = jsdocPath;
+    env.pwd = pwd;
+    env.args = process.argv.slice(2);
+})();
 
 /**
  * Data about the environment in which JSDoc is running, including the configuration settings that
@@ -43,10 +42,7 @@
  * @namespace
  * @name env
  */
-global.env = (function() {
-    'use strict';
-    return require('./lib/jsdoc/env');
-})();
+global.env = (() => require('./lib/jsdoc/env'))();
 
 /**
  * Data that must be shared across the entire application.
@@ -56,18 +52,11 @@ global.env = (function() {
  * @namespace
  * @name app
  */
-global.app = (function() {
-    'use strict';
-    return require('./lib/jsdoc/app');
-})();
+global.app = (() => require('./lib/jsdoc/app'))();
 
-(function() {
-    'use strict';
-
-    var env = global.env;
-    var logger = require('./lib/jsdoc/util/logger');
-    var runtime = require('./lib/jsdoc/util/runtime');
-    var cli = require('./cli');
+(() => {
+    const env = global.env;
+    const cli = require('./cli');
 
     function cb(errorCode) {
         cli.logFinish();
@@ -75,13 +64,9 @@ global.app = (function() {
     }
 
     cli.setVersionInfo()
-        .loadConfig();
-
-    if (!env.opts.test) {
-        cli.configureLogger();
-    }
-
-    cli.logStart();
+        .loadConfig()
+        .configureLogger()
+        .logStart();
 
     if (env.opts.debug) {
         /**
@@ -95,8 +80,8 @@ global.app = (function() {
          * @private
          * @param {...*} obj - Object(s) to print to stdout.
          */
-        global.dump = function() {
-            console.log(require('./lib/jsdoc/util/dumper').dump(arguments));
+        global.dump = (...args) => {
+            console.log(require('./lib/jsdoc/util/dumper').dump(args));
         };
     }
 
