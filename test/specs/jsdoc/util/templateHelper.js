@@ -567,13 +567,19 @@ describe("jsdoc/util/templateHelper", () => {
 
         for (let i = 0, l = a.length; i < l; i++) {
             for (const prop in a[i]) {
-                if ( hasOwnProp.call(a[i], prop) ) {
-                    expect(b[i][prop]).toBeDefined();
-                    expect(a[i][prop]).toEqual(b[i][prop]);
+                if (hasOwnProp.call(a[i], prop)) {
+                    expect(b[i]).toBeDefined();
+                    if (b[i]) {
+                        expect(b[i][prop]).toBeDefined();
+                        if (b[i][prop]) {
+                            expect(a[i][prop]).toEqual(b[i][prop]);
+                        }
+                    }
                 }
             }
         }
     }
+
     describe("getMembers", () => {
         // instead parse a file from fixtures and verify it?
         const classes = [
