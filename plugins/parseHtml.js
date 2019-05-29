@@ -53,6 +53,5 @@ exports.handlers = {
         });
 
         e.source = jsSource || e.source;
-
     }
 };
