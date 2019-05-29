@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-vars */
 /**
     @module plugins/containment
     @author Ger Hobbelt <ger@hobbelt.com>
  */
-'use strict';
+
 
 var logger = require('jsdoc/util/logger');
 
@@ -102,22 +103,22 @@ exports.handlers = {
     },
 
     parseComplete: function(e) {
-        console.log("parseComplete: ", JSON.stringify(arguments, null, 2));
+        console.log('parseComplete: ', JSON.stringify(arguments, null, 2));
         var doclets = e.doclets;
         var sourcefile;
         var i, len, doclet, range;
         var stack = [];
 
         // first link region end markers to their matching region start markers.
-        // 
+        //
         // complain loudly when there are holes and/or unmatched markers.
         for (i = 0, len = doclets.length; i < len; i++) {
             doclet = doclets[i];
-            // close previous topmost region. 
-            // 
+            // close previous topmost region.
+            //
             // Both `@}` and `@{` CANNOT exist in a single doclet as that would cause the start/end
             // linkup code in here to become more complicated, so we reject that situation.
-            // 
+            //
             // A future addition considered for this plugin is the `@{}` tag which
             // then should signal the parser that everything with the next code brace/brackets level
             // is a region and the comment writer doesn't want to bother with replicating that
@@ -126,12 +127,12 @@ exports.handlers = {
             // token is added to this plugin, we only have `@{` to start a region, then some code
             // chunks and probably some more comment doclets in there, terminated by a separate
             // comment (= doclet) which terminates that region: `@}`.
-            // 
+            //
             // Hence there's only one way to use these correctly together in a single comment/doclet:
             // first close the old region, then go and open a new one.
-            // 
+            //
             // Example:
-            // 
+            //
             // ```
             // /*
             //  * @}
@@ -156,85 +157,84 @@ exports.handlers = {
             //   };
             // )();
             // ```
-            // 
+            //
             if (doclet.regionMarkEnd) {
                 if (doclet.regionMarkStart) {
-                    console.error("both @{ and @} CANNOT co-exist in a single doclet comment. Failure at " + doclet.meta.lineno + " in " + doclet.meta.path);
-                if (doclet.regionNestingLevel <= 0) {
-                    console.error("unmatched @} range end tag at line " + doclet.meta.lineno + " in " + doclet.meta.path + ": missing matching @{");
-                } else if (doclet.matchingRegionStartMarker) {
-                    console.error("INTERNAL ERROR? @} range end tag at line " + doclet.meta.lineno + " in " + doclet.meta.path + " has already been linked up to a previous start marker!?");
-                } else if (stack[doclet.regionNestingLevel]) {
+                    console.error('both @{ and @} CANNOT co-exist in a single doclet comment. Failure at ' + doclet.meta.lineno + ' in ' + doclet.meta.path);
+                    if (doclet.regionNestingLevel <= 0) {
+                        console.error('unmatched @} range end tag at line ' + doclet.meta.lineno + ' in ' + doclet.meta.path + ': missing matching @{');
+                    } else if (doclet.matchingRegionStartMarker) {
+                        console.error('INTERNAL ERROR? @} range end tag at line ' + doclet.meta.lineno + ' in ' + doclet.meta.path + ' has already been linked up to a previous start marker!?');
+                    } else if (stack[doclet.regionNestingLevel]) {
                     // double-linked start to end and vice versa
-                    doclet.matchingRegionStartMarker = stack[doclet.regionNestingLevel];
-                    stack[doclet.regionNestingLevel].matchingRegionEndMarker = doclet;
+                        doclet.matchingRegionStartMarker = stack[doclet.regionNestingLevel];
+                        stack[doclet.regionNestingLevel].matchingRegionEndMarker = doclet;
 
-                    // now nuke the tracking slot so we cannot link the start marker to a later erroneously unmatched end marker at the same level:
-                    stack[doclet.regionNestingLevel] = undefined;
-                } else {
-                    console.error("unmatched @} range end tag at line " + doclet.meta.lineno + " in " + doclet.meta.path + ": no matching @{ found");
+                        // now nuke the tracking slot so we cannot link the start marker to a later erroneously unmatched end marker at the same level:
+                        stack[doclet.regionNestingLevel] = undefined;
+                    } else {
+                        console.error('unmatched @} range end tag at line ' + doclet.meta.lineno + ' in ' + doclet.meta.path + ': no matching @{ found');
+                    }
                 }
-            } 
-            // start a new (sub)region
-            if (doclet.regionMarkStart) {
-                if (doclet.regionNestingLevel <= 0) {
-                    console.error("cannot match corrupted @{ ... @} range start/end tag sequences due to previous error in @{ ... @} matching before line " + doclet.meta.lineno + " in " + doclet.meta.path);
-                } else if (doclet.matchingRegionEndMarker) {
-                    console.error("INTERNAL ERROR? @} range start tag at line " + doclet.meta.lineno + " in " + doclet.meta.path + " has already been linked up to a PREVIOUS end marker!?");
-                } else if (stack[doclet.regionNestingLevel]) {
-                    console.error("unmatched @{ range end tag at line " + stack[doclet.regionNestingLevel].meta.lineno + " in " + stack[doclet.regionNestingLevel].meta.path + ": no matching @} found");
-                } else {
-                    stack[doclet.regionNestingLevel] = doclet;
+                // start a new (sub)region
+                if (doclet.regionMarkStart) {
+                    if (doclet.regionNestingLevel <= 0) {
+                        console.error('cannot match corrupted @{ ... @} range start/end tag sequences due to previous error in @{ ... @} matching before line ' + doclet.meta.lineno + ' in ' + doclet.meta.path);
+                    } else if (doclet.matchingRegionEndMarker) {
+                        console.error('INTERNAL ERROR? @} range start tag at line ' + doclet.meta.lineno + ' in ' + doclet.meta.path + ' has already been linked up to a PREVIOUS end marker!?');
+                    } else if (stack[doclet.regionNestingLevel]) {
+                        console.error('unmatched @{ range end tag at line ' + stack[doclet.regionNestingLevel].meta.lineno + ' in ' + stack[doclet.regionNestingLevel].meta.path + ': no matching @} found');
+                    } else {
+                        stack[doclet.regionNestingLevel] = doclet;
+                    }
+                }
+            }
+
+            // last check before we go and do something useful: any lingering start markers are dangling:
+            for (i = 0, len = stack.length; i < len; i++) {
+                if (stack[i]) {
+                    console.error('unmatched @{ range start tag at line ' + stack[i].meta.lineno + ' in ' + stack[i].meta.path + ': no matching @} found');
+                }
+            }
+
+            // now postprocess all doclets between a set of region markers:
+            var region;
+
+            for (i = 0, len = doclets.length; i < len; i++) {
+                doclet = doclets[i];
+                if (doclet.regionMarkStart) {
+                    region = stack[doclet.regionNestingLevel] = doclet;
+
+                    // x
+
+
+                    if (doclet.regionNestingLevel <= 0) {
+                        console.error('unmatched @} range end tag at line ' + doclet.meta.lineno + ' in ' + doclet.meta.path + ': missing matching @{');
+                    } else if (doclet.matchingRegionStartMarker) {
+                        console.error('INTERNAL ERROR? @} range end tag at line ' + doclet.meta.lineno + ' in ' + doclet.meta.path + ' has already been linked up to a previous start marker!?');
+                    } else if (stack[doclet.regionNestingLevel]) {
+                        doclet.matchingRegionStartMarker = stack[doclet.regionNestingLevel];
+                        stack[doclet.regionNestingLevel].matchingRegionEndMarker = doclet;
+                        // now nuke the tracking slot so we cannot link the start marker to a later erroneously unmatched end marker at the same level:
+                        stack[doclet.regionNestingLevel] = undefined;
+                    } else {
+                        console.error('unmatched @} range end tag at line ' + doclet.meta.lineno + ' in ' + doclet.meta.path + ': no matching @{ found');
+                    }
+                }
+                // start a new (sub)region
+                if (doclet.regionMarkStart) {
+                    if (doclet.regionNestingLevel <= 0) {
+                        console.error('cannot match corrupted @{ ... @} range start/end tag sequences due to previous error in @{ ... @} matching before line ' + doclet.meta.lineno + ' in ' + doclet.meta.path);
+                    } else if (doclet.matchingRegionEndMarker) {
+                        console.error('INTERNAL ERROR? @} range start tag at line ' + doclet.meta.lineno + ' in ' + doclet.meta.path + ' has already been linked up to a PREVIOUS end marker!?');
+                    } else if (stack[doclet.regionNestingLevel]) {
+                        console.error('unmatched @{ range end tag at line ' + stack[doclet.regionNestingLevel].meta.lineno + ' in ' + stack[doclet.regionNestingLevel].meta.path + ': no matching @} found');
+                    } else {
+                        stack[doclet.regionNestingLevel] = doclet;
+                    }
                 }
             }
         }
-
-        // last check before we go and do something useful: any lingering start markers are dangling:
-        for (i = 0, len = stack.length; i < len; i++) {
-            if (stack[i]) {
-                console.error("unmatched @{ range start tag at line " + stack[i].meta.lineno + " in " + stack[i].meta.path + ": no matching @} found");
-            }
-        }
-
-        // now postprocess all doclets between a set of region markers:
-        var region;
-        for (i = 0, len = doclets.length; i < len; i++) {
-            doclet = doclets[i];
-            if (doclet.regionMarkStart) {
-                region = stack[doclet.regionNestingLevel] = doclet;
-
-                //x    
-
-
-
-
-                if (doclet.regionNestingLevel <= 0) {
-                    console.error("unmatched @} range end tag at line " + doclet.meta.lineno + " in " + doclet.meta.path + ": missing matching @{");
-                } else if (doclet.matchingRegionStartMarker) {
-                    console.error("INTERNAL ERROR? @} range end tag at line " + doclet.meta.lineno + " in " + doclet.meta.path + " has already been linked up to a previous start marker!?");
-                } else if (stack[doclet.regionNestingLevel]) {
-                    doclet.matchingRegionStartMarker = stack[doclet.regionNestingLevel];
-                    stack[doclet.regionNestingLevel].matchingRegionEndMarker = doclet;
-                    // now nuke the tracking slot so we cannot link the start marker to a later erroneously unmatched end marker at the same level:
-                    stack[doclet.regionNestingLevel] = undefined;
-                } else {
-                    console.error("unmatched @} range end tag at line " + doclet.meta.lineno + " in " + doclet.meta.path + ": no matching @{ found");
-                }
-            } 
-            // start a new (sub)region
-            if (doclet.regionMarkStart) {
-                if (doclet.regionNestingLevel <= 0) {
-                    console.error("cannot match corrupted @{ ... @} range start/end tag sequences due to previous error in @{ ... @} matching before line " + doclet.meta.lineno + " in " + doclet.meta.path);
-                } else if (doclet.matchingRegionEndMarker) {
-                    console.error("INTERNAL ERROR? @} range start tag at line " + doclet.meta.lineno + " in " + doclet.meta.path + " has already been linked up to a PREVIOUS end marker!?");
-                } else if (stack[doclet.regionNestingLevel]) {
-                    console.error("unmatched @{ range end tag at line " + stack[doclet.regionNestingLevel].meta.lineno + " in " + stack[doclet.regionNestingLevel].meta.path + ": no matching @} found");
-                } else {
-                    stack[doclet.regionNestingLevel] = doclet;
-                }
-            }
-        }
-
-
     }
 };
+

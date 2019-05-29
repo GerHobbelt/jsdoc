@@ -3,7 +3,7 @@
     @module plugins/parseHtml
     @author Aleksandar Rodic <aleksandar.xyz@gmail.com>
  */
-'use strict';
+
 
 exports.handlers = {
     /**
@@ -26,6 +26,7 @@ exports.handlers = {
         docComments.forEach(function(m) {
             // unify line ends, remove all comment characters, split into individual lines
             var lines = m.replace(/\r\n/g, '\n').replace(/^\s*\/\*\*|^\s*\*\/|^\s*\* ?|^\s+|^\s*\<\!-\-\s*|\s*\-\-\>/gm, '').split('\n');
+
             jsSource += '/**\n';
             for (var i = 0; i < lines.length; i++) {
                 if (lines[i] !== '') {
@@ -33,7 +34,6 @@ exports.handlers = {
                 }
             }
             jsSource += '*/\n\n';
-
         });
 
         // matches text between <script> and </script>
@@ -45,6 +45,7 @@ exports.handlers = {
         scriptText.forEach(function(m) {
             // remove script tags, split into individual lines
             var lines = m.replace(/\r\n/g, '\n').replace(/<script[\s\S]*?>|<\/script>/gmi, '').split('\n');
+
             for (var i = 0; i < lines.length; i++) {
                 if (lines[i] !== '') {
                     jsSource += lines[i] + '\n';

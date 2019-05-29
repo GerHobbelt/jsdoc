@@ -465,7 +465,7 @@ exports.publish = (taffyData, opts, tutorials) => {
         keepMarkedAsIgnore: true,
         keepMembersOfAnonymous: true,
         keepAllAccessLevels: true,
-        //keepEveryone: true
+        // keepEveryone: true,
     });
     data.sort('longname, version, since');
     helper.addEventListeners(data);

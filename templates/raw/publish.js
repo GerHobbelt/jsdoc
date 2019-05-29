@@ -1,12 +1,12 @@
 /**
-    @overview Output a 'RAW' JSDoc data JSON and perform some preliminary analysis on the 
+    @overview Output a 'RAW' JSDoc data JSON and perform some preliminary analysis on the
     gathered data: undocumented functions, etc.
 
     @version 0.0.2
     @example
-        ./jsdoc scratch/jsdoc_test.js -t templates/raw -d doc-diag 
+        ./jsdoc scratch/jsdoc_test.js -t templates/raw -d doc-diag
  */
-'use strict';
+
 
 var doop = require('jsdoc/util/doop');
 var env = require('jsdoc/env');
@@ -20,7 +20,7 @@ var util = require('util');
 var xml = require('js2xmlparser');
 
 var htmlsafe = helper.htmlsafe;
-//var linkto = helper.linkto;            // protect ourselves from accidentally using this one directly without any tweaking...
+// var linkto = helper.linkto;            // protect ourselves from accidentally using this one directly without any tweaking...
 var resolveAuthorLinks = helper.resolveAuthorLinks;
 var scopeToPunc = helper.scopeToPunc;
 var hasOwnProp = Object.prototype.hasOwnProperty;
@@ -39,19 +39,22 @@ var outdir = path.normalize(env.opts.destination);
 function extend(dst /* , src... */) {
     dst = dst || {};
     var args = Array.prototype.slice.call(arguments, 1);
+
     for (var i = 0; i < args.length; i++) {
         var src = args[i];
+
         if (src) {
             for (var key in src) {
                 dst[key] = src[key];
             }
         }
     }
+
     return dst;
 }
 
 function renderView(template, data) {
-    //return view.render(template, data);
+    // return view.render(template, data);
     return data;
 }
 
@@ -59,45 +62,47 @@ function resolveLinksHelper(html) {
     var rv, count, iv;
 
     switch (typeof html) {
-    case "string":
-        iv = helper.resolveLinks(html, linkToOptions);
-        if (iv === html) {
+        case 'string':
+            iv = helper.resolveLinks(html, linkToOptions);
+            if (iv === html) {
             // don't include this bugger in the HTMLized copy as there's really nothing to HTMLize here...
-            return null;
-        }
-        return iv;
+                return null;
+            }
 
-    case "object":
-        rv = null;
-        count = 0;
-        if (Array.isArray(html)) {
-            rv = [];
-            for (var i = 0, len = html.length; i < len; i++) {
-                iv = resolveLinksHelper(html[i]);
-                if (iv !== null) {
-                    count++;
-                    rv[i] = iv;
+            return iv;
+
+        case 'object':
+            rv = null;
+            count = 0;
+            if (Array.isArray(html)) {
+                rv = [];
+                for (var i = 0, len = html.length; i < len; i++) {
+                    iv = resolveLinksHelper(html[i]);
+                    if (iv !== null) {
+                        count++;
+                        rv[i] = iv;
+                    }
+                }
+            } else if (html) {
+                rv = {};
+                for (var key in html) {
+                    iv = resolveLinksHelper(html[key]);
+                    if (iv !== null) {
+                        count++;
+                        rv[key] = iv;
+                    }
                 }
             }
-        } else if (html) {
-            rv = {};
-            for (var key in html) {
-                iv = resolveLinksHelper(html[key]);
-                if (iv !== null) {
-                    count++;
-                    rv[key] = iv;
-                }
+            // don't include this bugger in the HTMLized copy as there's really nothing to HTMLize here...
+            if (count === 0) {
+                return null;
             }
-        }
-        // don't include this bugger in the HTMLized copy as there's really nothing to HTMLize here...
-        if (count === 0) {
-            return null;
-        }
-        return rv;
 
-    default:
+            return rv;
+
+        default:
         // don't include this bugger in the HTMLized copy as there's really nothing to HTMLize here...
-        return null;
+            return null;
     }
 }
 
@@ -106,10 +111,10 @@ function find(spec) {
 }
 
 function tutoriallink(tutorial, options) {
-    return helper.toTutorial(tutorial, null, { 
-        tag: 'em', 
-        classname: 'disabled', 
-        prefix: 'Tutorial: ' 
+    return helper.toTutorial(tutorial, null, {
+        tag: 'em',
+        classname: 'disabled',
+        prefix: 'Tutorial: '
     }, options);
 }
 
@@ -123,6 +128,7 @@ function hashToLink(doclet, hash) {
     var url = helper.createLink(doclet);
 
     url = url.replace(/(#.+|$)/, hash);
+
     return '<a href="' + url + '">' + hash + '</a>';
 }
 
@@ -167,6 +173,7 @@ function getSignatureAttributes(item) {
 function updateItemName(item) {
     var attributes = getSignatureAttributes(item);
     var itemName = item.name || '';
+
     return extend({}, item, {
         itemName: itemName,
         isVariable: item.variable,
@@ -262,10 +269,10 @@ function getPathFromDoclet(doclet) {
 }
 
 function generate(type, longname, title, docs, filename, resolveLinks) {
-    resolveLinks = resolveLinks === false ? false : true;
+    resolveLinks = (resolveLinks !== false);
 
     var docData = {
-        //env: env,
+        // env: env,
         title: title,
         docs: docs
     };
@@ -279,9 +286,9 @@ function generate(type, longname, title, docs, filename, resolveLinks) {
 
     summary.push({
         type: type,
-        name: title, 
+        name: title,
         longname: longname,
-        data: docs, 
+        data: docs,
         filename: filename,
         outpath: outpath,
         resolveLinks: resolveLinks,
@@ -295,6 +302,7 @@ function generateSourceFiles(sourceFiles, encoding) {
         var source;
         // links are keyed to the shortened path in each doclet's `meta.shortpath` property
         var sourceOutfile = helper.getUniqueFilename(sourceFiles[file].shortened);
+
         helper.registerLink(sourceFiles[file].shortened, sourceOutfile);
 
         try {
@@ -378,6 +386,7 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
             }
             else if ( !hasOwnProp.call(itemsSeen, item.longname) ) {
                 var displayName;
+
                 if (env.conf.templates.default.useLongnameInNav) {
                     displayName = item.longname;
                 } else {
@@ -456,7 +465,7 @@ function buildNav(members) {
         }
         else {
             nav.globals = {
-                heading: "Global",
+                heading: 'Global',
                 list: globalNav
             };
         }
@@ -467,25 +476,25 @@ function buildNav(members) {
 
 /**
  * Spit out the *complete* source/documentation info tree produced by the JSDoc core.
- * 
+ *
  * The tree is augmented with the derived info bits gathered by internal cross-referencing, etc.
  * as is done by the `default` template: all info is presented in *raw* form so you will be
- * able to use this info in any way you want. 
+ * able to use this info in any way you want.
  *
  * ## Strike 1
- * 
- * **_Nothing_ got filtered/removed!** 
+ *
+ * **_Nothing_ got filtered/removed!**
  *
  * ## Strike 2
- * 
+ *
  * We expect your subsequent process to pick and take what it wants/needs. The output is **not
  * intended for human consumption** but is meant to serve as a *maximum power* data feed for
  * subsequent tools in your documentation chain.
  *
  * ## Strike 3 -- and you're *it*
- * 
+ *
  * You have been warned. The output *will* include JSDoc internals which will remain *undocumented*.
- * 
+ *
  * You, the receiver, are an experienced engineer who does not panic when faced with a bit
  * of RTFC when things become hairy.
  *
@@ -495,7 +504,7 @@ function buildNav(members) {
  * @param  {object} opts        options coming in
  * @param  {Tutorial} tutorials Optional tutorials
  *
- * @return {object}             All the raw and augmented data in one big tree, 
+ * @return {object}             All the raw and augmented data in one big tree,
  *                              ready to be dumped to JSON file
  *
  * ## Internal Developer Note
@@ -512,15 +521,17 @@ function buildNav(members) {
  *
  * **TL;DR**: DO NOT REFACTOR because you think that 'improves' the template code. Stay close
  * to the `default` template code as much as possible so that tools like Beyond Compare(tm)
- * can provide optimal help in your compare,match & mix software update/improvement work. 
+ * can provide optimal help in your compare,match & mix software update/improvement work.
  */
 var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
     data = taffyData;
 
     var conf = env.conf.templates || {};
+
     conf.raw = conf.raw || {};
 
     var templatePath = path.normalize(opts.template);
+
     view = new template.Template( path.join(templatePath, 'tmpl') );
 
     // claim some special filenames in advance, so the All-Powerful Overseer of Filename Uniqueness
@@ -529,6 +540,7 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
     // don't call registerLink() on this one! 'index' is also a valid longname
 
     var globalUrl = helper.getUniqueFilename('global');
+
     helper.registerLink('global', globalUrl);
 
     // set up templating
@@ -545,15 +557,16 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
         keepMarkedAsIgnore: true,
         keepMembersOfAnonymous: true,
         keepAllAccessLevels: true,
-        //keepEveryone: true
+        // keepEveryone: true,
     });
-    //data.sort('longname, version, since');
+    // data.sort('longname, version, since');
     helper.addEventListeners(data);
 
     var sourceFiles = {};
     var sourceFilePaths = [];
+
     data().each(function(doclet) {
-         doclet.attribs = '';
+        doclet.attribs = '';
 
         if (doclet.examples) {
             doclet.examples = doclet.examples.map(function(example) {
@@ -578,6 +591,7 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
 
         // build a list of source files
         var sourcePath;
+
         if (doclet.meta) {
             sourcePath = getPathFromDoclet(doclet);
             sourceFiles[sourcePath] = {
@@ -591,7 +605,8 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
     });
 
     // update outdir if necessary, then create outdir
-    var packageInfo = ( find({kind: 'package'}) || [] ) [0];
+    var packageInfo = ( find({kind: 'package'}) || [] )[0];
+
     if (packageInfo && packageInfo.name) {
         outdir = path.join( outdir, packageInfo.name, (packageInfo.version || '') );
     }
@@ -606,6 +621,7 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
 
         staticFiles.forEach(function(fileName) {
             var toDir = fs.toDir( fileName.replace(fromDir, outdir) );
+
             fs.mkPath(toDir);
             fs.copyFileSync(fileName, toDir);
         });
@@ -614,6 +630,7 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
         var staticFilePaths;
         var staticFileFilter;
         var staticFileScanner;
+
         if (conf.raw.staticFiles) {
             // The canonical property name is `include`. We accept `paths` for backwards compatibility
             // with a bug in JSDoc 3.2.x.
@@ -632,22 +649,25 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
                 extraStaticFiles.forEach(function(fileName) {
                     var sourcePath = fs.toDir(filePath);
                     var toDir = fs.toDir( fileName.replace(sourcePath, outdir) );
+
                     fs.mkPath(toDir);
                     fs.copyFileSync(fileName, toDir);
                 });
             });
         }
     }
-    
+
     if (sourceFilePaths.length) {
         sourceFiles = shortenPaths( sourceFiles, path.commonPrefix(sourceFilePaths) );
     }
     data().each(function(doclet) {
         var url = helper.createLink(doclet);
+
         helper.registerLink(doclet.longname, url);
 
         // add a shortened version of the full path
         var docletPath;
+
         if (doclet.meta) {
             docletPath = getPathFromDoclet(doclet);
             docletPath = sourceFiles[docletPath].shortened;
@@ -691,11 +711,11 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
     });
 
     var members = helper.getMembers(data);
+
     members.tutorials = tutorials.children;
 
     // output pretty-printed source files by default
-    var outputSourceFiles = conf.raw && conf.raw.outputSourceFiles !== false ? true :
-        false;
+    var outputSourceFiles = !!(conf.raw && conf.raw.outputSourceFiles !== false);
 
     // add template helpers
     view.find = find;
@@ -707,6 +727,7 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
 
     // once for all
     var nav = view.nav = buildNav(members);
+
     attachModuleSymbols( find({ longname: {left: 'module:'} }), members.modules );
 
     // generate the pretty-printed source files first so other pages can link to them
@@ -722,9 +743,11 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
 
     generate('Home', null, 'Home',
         packages.concat(
-            [{kind: 'mainpage', readme: opts.readme, longname: (opts.mainpagetitle) ? opts.mainpagetitle : 'Main Page'}]
+            [{kind: 'mainpage',
+                readme: opts.readme,
+                longname: (opts.mainpagetitle) ? opts.mainpagetitle : 'Main Page'}]
         ).concat(files),
-    indexUrl);
+        indexUrl);
 
     // set up the lists that we'll use to generate pages
     var classes = taffy(members.classes);
@@ -736,31 +759,37 @@ var regurgitate = exports.regurgitate = function(taffyData, opts, tutorials) {
 
     Object.keys(helper.longnameToUrl).forEach(function(longname) {
         var myModules = helper.find(modules, {longname: longname});
+
         if (myModules.length) {
             generate('Module', longname, myModules[0].name, myModules, helper.longnameToUrl[longname]);
         }
 
         var myClasses = helper.find(classes, {longname: longname});
+
         if (myClasses.length) {
             generate('Class', longname, myClasses[0].name, myClasses, helper.longnameToUrl[longname]);
         }
 
         var myNamespaces = helper.find(namespaces, {longname: longname});
+
         if (myNamespaces.length) {
             generate('Namespace', longname, myNamespaces[0].name, myNamespaces, helper.longnameToUrl[longname]);
         }
 
         var myMixins = helper.find(mixins, {longname: longname});
+
         if (myMixins.length) {
             generate('Mixin', longname, myMixins[0].name, myMixins, helper.longnameToUrl[longname]);
         }
 
         var myExternals = helper.find(externals, {longname: longname});
+
         if (myExternals.length) {
             generate('External', longname, myExternals[0].name, myExternals, helper.longnameToUrl[longname]);
         }
 
         var myInterfaces = helper.find(interfaces, {longname: longname});
+
         if (myInterfaces.length) {
             generate('Interface', longname, myInterfaces[0].name, myInterfaces, helper.longnameToUrl[longname]);
         }
@@ -856,8 +885,8 @@ exports.publish = function(taffyData, opts, tutorials) {
 
         fs.mkPath(outputDir);
 
-        fs.writeFileSync(path.join(outputDir, "JSDoc.RAW" + "." + outputFormat),
-                outputFormat === 'json' ? JSON.stringify(root, null, 4) :  xml('jsdoc', root),
-                'utf8');
+        fs.writeFileSync(path.join(outputDir, 'JSDoc.RAW' + '.' + outputFormat),
+            outputFormat === 'json' ? JSON.stringify(root, null, 4) : xml('jsdoc', root),
+            'utf8');
     }
 };

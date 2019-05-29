@@ -41,6 +41,7 @@ describe('@enum tag', () => {
     it('Should support numeric keys', function() {
         var docSet2 = jsdoc.getDocSetFromFile('test/fixtures/numericenum.js');
         var numericEnum = docSet2.getByLongname('NumericEnum')[0];
+
         expect(numericEnum.properties[0].name).toBe('0');
         expect(numericEnum.properties[1].name).toBe('1');
     });

@@ -5,227 +5,227 @@
     @example
         ./jsdoc scratch/jsdoc_test.js -t templates/haruki -d console -q format=xml
  */
-'use strict';
+
 
 var hasOwnProp = Object.prototype.hasOwnProperty;
 
 function graft(parentNode, childNodes, parentLongname, parentName) {
     childNodes
-    .filter(function (element) {
-        return (element.memberof === parentLongname);
-    })
-    .forEach(function (element, index) {
-        var i,
-            len;
+        .filter(function(element) {
+            return (element.memberof === parentLongname);
+        })
+        .forEach(function(element, index) {
+            var i,
+                len;
 
-        if (element.kind === 'namespace') {
-            if (!parentNode.namespaces) {
-                parentNode.namespaces = [];
-            }
-
-            var thisNamespace = {
-                'name': element.name,
-                'description': element.description || '',
-                'access': element.access || '',
-                'virtual': !!element.virtual
-            };
-
-            parentNode.namespaces.push(thisNamespace);
-
-            graft(thisNamespace, childNodes, element.longname, element.name);
-        }
-        else if (element.kind === 'mixin') {
-            if (!parentNode.mixins) {
-                parentNode.mixins = [];
-            }
-
-            var thisMixin = {
-                'name': element.name,
-                'description': element.description || '',
-                'access': element.access || '',
-                'virtual': !!element.virtual
-            };
-
-            parentNode.mixins.push(thisMixin);
-
-            graft(thisMixin, childNodes, element.longname, element.name);
-        }
-        else if (element.kind === 'function') {
-            if (!parentNode.functions) {
-                parentNode.functions = [];
-            }
-
-            var thisFunction = {
-                'name': element.name,
-                'access': element.access || '',
-                'virtual': !!element.virtual,
-                'description': element.description || '',
-                'parameters': [ ],
-                'examples': []
-            };
-
-            parentNode.functions.push(thisFunction);
-
-            if (element.returns) {
-                thisFunction.returns = {
-                    'type': element.returns[0].type? (element.returns[0].type.names.length === 1? element.returns[0].type.names[0] : element.returns[0].type.names) : '',
-                    'description': element.returns[0].description || ''
-                };
-            }
-
-            if (element.examples) {
-                for (i = 0, len = element.examples.length; i < len; i++) {
-                    thisFunction.examples.push(element.examples[i]);
+            if (element.kind === 'namespace') {
+                if (!parentNode.namespaces) {
+                    parentNode.namespaces = [];
                 }
-            }
 
-            if (element.params) {
-                for (i = 0, len = element.params.length; i < len; i++) {
-                    thisFunction.parameters.push({
-                        'name': element.params[i].name,
-                        'type': element.params[i].type? (element.params[i].type.names.length === 1? element.params[i].type.names[0] : element.params[i].type.names) : '',
-                        'description': element.params[i].description || '',
-                        'default': hasOwnProp.call(element.params[i], 'defaultvalue') ? element.params[i].defaultvalue : '',
-                        'optional': typeof element.params[i].optional === 'boolean'? element.params[i].optional : '',
-                        'nullable': typeof element.params[i].nullable === 'boolean'? element.params[i].nullable : ''
-                    });
-                }
-            }
-        }
-        else if (element.kind === 'member') {
-            if (!parentNode.properties) {
-                parentNode.properties = [];
-            }
-            parentNode.properties.push({
-                'name': element.name,
-                'access': element.access || '',
-                'virtual': !!element.virtual,
-                'description': element.description || '',
-                'type': element.type? (element.type.length === 1? element.type[0] : element.type) : ''
-            });
-        }
-
-        else if (element.kind === 'event') {
-            if (!parentNode.events) {
-                parentNode.events = [];
-            }
-
-            var thisEvent = {
-                'name': element.name,
-                'access': element.access || '',
-                'virtual': !!element.virtual,
-                'description': element.description || '',
-                'parameters': [],
-                'examples': []
-            };
-
-            parentNode.events.push(thisEvent);
-
-            if (element.returns) {
-                thisEvent.returns = {
-                    'type': element.returns.type? (element.returns.type.names.length === 1? element.returns.type.names[0] : element.returns.type.names) : '',
-                    'description': element.returns.description || ''
-                };
-            }
-
-            if (element.examples) {
-                for (i = 0, len = element.examples.length; i < len; i++) {
-                    thisEvent.examples.push(element.examples[i]);
-                }
-            }
-
-            if (element.params) {
-                for (i = 0, len = element.params.length; i < len; i++) {
-                    thisEvent.parameters.push({
-                        'name': element.params[i].name,
-                        'type': element.params[i].type? (element.params[i].type.names.length === 1? element.params[i].type.names[0] : element.params[i].type.names) : '',
-                        'description': element.params[i].description || '',
-                        'default': hasOwnProp.call(element.params[i], 'defaultvalue') ? element.params[i].defaultvalue : '',
-                        'optional': typeof element.params[i].optional === 'boolean'? element.params[i].optional : '',
-                        'nullable': typeof element.params[i].nullable === 'boolean'? element.params[i].nullable : ''
-                    });
-                }
-            }
-        }
-        else if (element.kind === 'typedef') {
-            if (!parentNode.typedefs) {
-                parentNode.typedefs = [];
-            }
-
-            var thisTypedef = {
-                'name': element.name,
-                'description': element.description || '',
-                'properties': []
-            }
-
-            parentNode.typedefs.push(thisTypedef);
-
-            if (element.examples) {
-                for (i = 0, len = element.examples.length; i < len; i++) {
-                    thisTypedef.constructor.examples.push(element.examples[i]);
-                }
-            }
-
-            if (element.properties) {
-                for (i = 0, len = element.properties.length; i < len; i++) {
-                    thisTypedef.properties.push({
-                        'name': element.properties[i].name,
-                        'type': element.properties[i].type? (element.properties[i].type.names.length === 1? element.properties[i].type.names[0] : element.params[i].type.names) : '',
-                        'description': element.properties[i].description || '',
-                        'default': hasOwnProp.call(element.properties[i], 'defaultvalue') ? element.properties[i].defaultvalue : '',
-                        'optional': typeof element.properties[i].optional === 'boolean'? element.properties[i].optional : '',
-                        'nullable': typeof element.properties[i].nullable === 'boolean'? element.properties[i].nullable : ''
-                    });
-                }
-            }
-
-            graft(thisTypedef, childNodes, element.longname, element.name);
-        }
-        else if (element.kind === 'class') {
-            if (!parentNode.classes) {
-                parentNode.classes = [];
-            }
-
-            var thisClass = {
-                'name': element.name,
-                'description': element.classdesc || '',
-                'extends': element.augments || [],
-                'access': element.access || '',
-                'virtual': !!element.virtual,
-                'fires': element.fires || '',
-                'constructor': {
+                var thisNamespace = {
                     'name': element.name,
                     'description': element.description || '',
-                    'parameters': [
-                    ],
+                    'access': element.access || '',
+                    'virtual': !!element.virtual
+                };
+
+                parentNode.namespaces.push(thisNamespace);
+
+                graft(thisNamespace, childNodes, element.longname, element.name);
+            }
+            else if (element.kind === 'mixin') {
+                if (!parentNode.mixins) {
+                    parentNode.mixins = [];
+                }
+
+                var thisMixin = {
+                    'name': element.name,
+                    'description': element.description || '',
+                    'access': element.access || '',
+                    'virtual': !!element.virtual
+                };
+
+                parentNode.mixins.push(thisMixin);
+
+                graft(thisMixin, childNodes, element.longname, element.name);
+            }
+            else if (element.kind === 'function') {
+                if (!parentNode.functions) {
+                    parentNode.functions = [];
+                }
+
+                var thisFunction = {
+                    'name': element.name,
+                    'access': element.access || '',
+                    'virtual': !!element.virtual,
+                    'description': element.description || '',
+                    'parameters': [],
                     'examples': []
+                };
+
+                parentNode.functions.push(thisFunction);
+
+                if (element.returns) {
+                    thisFunction.returns = {
+                        'type': element.returns[0].type? (element.returns[0].type.names.length === 1? element.returns[0].type.names[0] : element.returns[0].type.names) : '',
+                        'description': element.returns[0].description || ''
+                    };
                 }
-            };
 
-            parentNode.classes.push(thisClass);
+                if (element.examples) {
+                    for (i = 0, len = element.examples.length; i < len; i++) {
+                        thisFunction.examples.push(element.examples[i]);
+                    }
+                }
 
-            if (element.examples) {
-                for (i = 0, len = element.examples.length; i < len; i++) {
-                    thisClass.constructor.examples.push(element.examples[i]);
+                if (element.params) {
+                    for (i = 0, len = element.params.length; i < len; i++) {
+                        thisFunction.parameters.push({
+                            'name': element.params[i].name,
+                            'type': element.params[i].type? (element.params[i].type.names.length === 1? element.params[i].type.names[0] : element.params[i].type.names) : '',
+                            'description': element.params[i].description || '',
+                            'default': hasOwnProp.call(element.params[i], 'defaultvalue') ? element.params[i].defaultvalue : '',
+                            'optional': typeof element.params[i].optional === 'boolean'? element.params[i].optional : '',
+                            'nullable': typeof element.params[i].nullable === 'boolean'? element.params[i].nullable : ''
+                        });
+                    }
                 }
             }
-
-            if (element.params) {
-                for (i = 0, len = element.params.length; i < len; i++) {
-                    thisClass.constructor.parameters.push({
-                        'name': element.params[i].name,
-                        'type': element.params[i].type? (element.params[i].type.names.length === 1? element.params[i].type.names[0] : element.params[i].type.names) : '',
-                        'description': element.params[i].description || '',
-                        'default': hasOwnProp.call(element.params[i], 'defaultvalue') ? element.params[i].defaultvalue : '',
-                        'optional': typeof element.params[i].optional === 'boolean'? element.params[i].optional : '',
-                        'nullable': typeof element.params[i].nullable === 'boolean'? element.params[i].nullable : ''
-                    });
+            else if (element.kind === 'member') {
+                if (!parentNode.properties) {
+                    parentNode.properties = [];
                 }
+                parentNode.properties.push({
+                    'name': element.name,
+                    'access': element.access || '',
+                    'virtual': !!element.virtual,
+                    'description': element.description || '',
+                    'type': element.type? (element.type.length === 1? element.type[0] : element.type) : ''
+                });
             }
 
-            graft(thisClass, childNodes, element.longname, element.name);
-       }
-    });
+            else if (element.kind === 'event') {
+                if (!parentNode.events) {
+                    parentNode.events = [];
+                }
+
+                var thisEvent = {
+                    'name': element.name,
+                    'access': element.access || '',
+                    'virtual': !!element.virtual,
+                    'description': element.description || '',
+                    'parameters': [],
+                    'examples': []
+                };
+
+                parentNode.events.push(thisEvent);
+
+                if (element.returns) {
+                    thisEvent.returns = {
+                        'type': element.returns.type? (element.returns.type.names.length === 1? element.returns.type.names[0] : element.returns.type.names) : '',
+                        'description': element.returns.description || ''
+                    };
+                }
+
+                if (element.examples) {
+                    for (i = 0, len = element.examples.length; i < len; i++) {
+                        thisEvent.examples.push(element.examples[i]);
+                    }
+                }
+
+                if (element.params) {
+                    for (i = 0, len = element.params.length; i < len; i++) {
+                        thisEvent.parameters.push({
+                            'name': element.params[i].name,
+                            'type': element.params[i].type? (element.params[i].type.names.length === 1? element.params[i].type.names[0] : element.params[i].type.names) : '',
+                            'description': element.params[i].description || '',
+                            'default': hasOwnProp.call(element.params[i], 'defaultvalue') ? element.params[i].defaultvalue : '',
+                            'optional': typeof element.params[i].optional === 'boolean'? element.params[i].optional : '',
+                            'nullable': typeof element.params[i].nullable === 'boolean'? element.params[i].nullable : ''
+                        });
+                    }
+                }
+            }
+            else if (element.kind === 'typedef') {
+                if (!parentNode.typedefs) {
+                    parentNode.typedefs = [];
+                }
+
+                var thisTypedef = {
+                    'name': element.name,
+                    'description': element.description || '',
+                    'properties': []
+                };
+
+                parentNode.typedefs.push(thisTypedef);
+
+                if (element.examples) {
+                    for (i = 0, len = element.examples.length; i < len; i++) {
+                        thisTypedef.constructor.examples.push(element.examples[i]);
+                    }
+                }
+
+                if (element.properties) {
+                    for (i = 0, len = element.properties.length; i < len; i++) {
+                        thisTypedef.properties.push({
+                            'name': element.properties[i].name,
+                            'type': element.properties[i].type? (element.properties[i].type.names.length === 1? element.properties[i].type.names[0] : element.params[i].type.names) : '',
+                            'description': element.properties[i].description || '',
+                            'default': hasOwnProp.call(element.properties[i], 'defaultvalue') ? element.properties[i].defaultvalue : '',
+                            'optional': typeof element.properties[i].optional === 'boolean'? element.properties[i].optional : '',
+                            'nullable': typeof element.properties[i].nullable === 'boolean'? element.properties[i].nullable : ''
+                        });
+                    }
+                }
+
+                graft(thisTypedef, childNodes, element.longname, element.name);
+            }
+            else if (element.kind === 'class') {
+                if (!parentNode.classes) {
+                    parentNode.classes = [];
+                }
+
+                var thisClass = {
+                    'name': element.name,
+                    'description': element.classdesc || '',
+                    'extends': element.augments || [],
+                    'access': element.access || '',
+                    'virtual': !!element.virtual,
+                    'fires': element.fires || '',
+                    'constructor': {
+                        'name': element.name,
+                        'description': element.description || '',
+                        'parameters': [
+                        ],
+                        'examples': []
+                    }
+                };
+
+                parentNode.classes.push(thisClass);
+
+                if (element.examples) {
+                    for (i = 0, len = element.examples.length; i < len; i++) {
+                        thisClass.constructor.examples.push(element.examples[i]);
+                    }
+                }
+
+                if (element.params) {
+                    for (i = 0, len = element.params.length; i < len; i++) {
+                        thisClass.constructor.parameters.push({
+                            'name': element.params[i].name,
+                            'type': element.params[i].type? (element.params[i].type.names.length === 1? element.params[i].type.names[0] : element.params[i].type.names) : '',
+                            'description': element.params[i].description || '',
+                            'default': hasOwnProp.call(element.params[i], 'defaultvalue') ? element.params[i].defaultvalue : '',
+                            'optional': typeof element.params[i].optional === 'boolean'? element.params[i].optional : '',
+                            'nullable': typeof element.params[i].nullable === 'boolean'? element.params[i].nullable : ''
+                        });
+                    }
+                }
+
+                graft(thisClass, childNodes, element.longname, element.name);
+            }
+        });
 }
 
 /**
@@ -244,6 +244,7 @@ exports.publish = function(data, opts) {
     if (opts.destination === 'console') {
         if (opts.query && opts.query.format === 'xml') {
             var xml = require('js2xmlparser');
+
             console.log( xml('jsdoc', root) );
         }
         else {
@@ -251,7 +252,7 @@ exports.publish = function(data, opts) {
         }
     }
     else {
-        var fs = require("jsdoc/fs"),
+        var fs = require('jsdoc/fs'),
             path = require('jsdoc/path'),
             xml = require('js2xmlparser'),
             outputDir = path.normalize(opts.destination),
@@ -261,8 +262,8 @@ exports.publish = function(data, opts) {
 
         root.classes.forEach(function(item) {
             fs.writeFileSync(
-                path.join(outputDir, item.name + "." + outputFormat),
-                outputFormat === 'json' ? JSON.stringify(item, null, 4) :  xml('jsdoc', item),
+                path.join(outputDir, item.name + '.' + outputFormat),
+                outputFormat === 'json' ? JSON.stringify(item, null, 4) : xml('jsdoc', item),
                 'utf8');
         });
     }
