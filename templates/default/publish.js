@@ -464,7 +464,7 @@ exports.publish = (taffyData, opts, tutorials) => {
         keepUndocumented: true,
         keepMarkedAsIgnore: true,
         keepMembersOfAnonymous: true,
-        keepAllAccessLevels: true,
+        keepAllAccessLevels: true
         // keepEveryone: true,
     });
     data.sort('longname, version, since');
