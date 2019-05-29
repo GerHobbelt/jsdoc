@@ -1,6 +1,6 @@
 {
   "name": "@gerhobbelt/jsdoc",
-  "version": "4.0.0-1",
+  "version": "4.0.0-2",
   "description": "An API documentation generator for JavaScript.",
   "keywords": [
     "documentation",
