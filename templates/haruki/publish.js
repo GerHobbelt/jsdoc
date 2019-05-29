@@ -6,6 +6,11 @@
         ./jsdoc scratch/jsdoc_test.js -t templates/haruki -d console -q format=xml
  */
 
+var xml = require('js2xmlparser');
+var dumper = require('jsdoc/util/dumper');
+var fs = require('jsdoc/fs');
+var path = require('jsdoc/path');
+
 
 var hasOwnProp = Object.prototype.hasOwnProperty;
 
@@ -243,20 +248,15 @@ exports.publish = function(data, opts) {
 
     if (opts.destination === 'console') {
         if (opts.query && opts.query.format === 'xml') {
-            var xml = require('js2xmlparser');
-
             console.log( xml('jsdoc', root) );
         }
         else {
-            console.log( require('jsdoc/util/dumper').dump(root) );
+            console.log( dumper.dump(root) );
         }
     }
     else {
-        var fs = require('jsdoc/fs'),
-            path = require('jsdoc/path'),
-            xml = require('js2xmlparser'),
-            outputDir = path.normalize(opts.destination),
-            outputFormat = opts.query && opts.query.format === 'xml' ? 'xml' : 'json';
+        var outputDir = path.normalize(opts.destination);
+        var outputFormat = opts.query && opts.query.format === 'xml' ? 'xml' : 'json';
 
         fs.mkPath(outputDir);
 

@@ -16,13 +16,11 @@ var logger = require('jsdoc/util/logger');
 var path = require('jsdoc/path');
 var taffy = require('taffydb').taffy;
 var template = require('jsdoc/template');
-var util = require('util');
 var xml = require('js2xmlparser');
 
 var htmlsafe = helper.htmlsafe;
 // var linkto = helper.linkto;            // protect ourselves from accidentally using this one directly without any tweaking...
 var resolveAuthorLinks = helper.resolveAuthorLinks;
-var scopeToPunc = helper.scopeToPunc;
 var hasOwnProp = Object.prototype.hasOwnProperty;
 
 var data;
@@ -885,7 +883,7 @@ exports.publish = function(taffyData, opts, tutorials) {
 
         fs.mkPath(outputDir);
 
-        fs.writeFileSync(path.join(outputDir, 'JSDoc.RAW' + '.' + outputFormat),
+        fs.writeFileSync(path.join(outputDir, 'JSDoc.RAW.' + outputFormat),
             outputFormat === 'json' ? JSON.stringify(root, null, 4) : xml('jsdoc', root),
             'utf8');
     }

@@ -44,7 +44,9 @@
   },
   "scripts": {
     "build": "gulp lint; gulp test",
-    "lint": "gulp lint",
+    "gulp-lint": "gulp lint",
+    "lint": "eslint *.js lib/**/*.js plugins/*.js templates/**/*.js test/specs/**/*.js",
+    "fix": "eslint *.js lib/**/*.js plugins/*.js templates/**/*.js test/specs/**/*.js --fix",
     "test": "node jsdoc.js -T",
     "pub": "npm publish --access public"
   },

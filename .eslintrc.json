@@ -60,7 +60,7 @@
         "dot-location": ["error", "property"],
         "dot-notation": "error",
         "eqeqeq": ["error", "smart"],
-        "guard-for-in": "error",
+        "guard-for-in": "warn",
         "max-classes-per-file": "off",
         "no-alert": "error",
         "no-caller": "error",
@@ -77,7 +77,7 @@
         "no-fallthrough": "off", // disabled due to bug in ESLint
         "no-floating-decimal": "error",
         "no-global-assign": "error",
-        "no-implicit-coercion": "error",
+        "no-implicit-coercion": ["error", { "allow": ["!!"] } ],
         "no-implicit-globals": "error",
         "no-implied-eval": "error",
         "no-invalid-this": "error",
@@ -135,7 +135,7 @@
         "no-undef": "error",
         "no-undef-init": "error",
         "no-undefined": "off",
-        "no-unused-vars": "error",
+        "no-unused-vars": "warn",
         "no-use-before-define": "error",
 
         // Node.js and CommonJS
@@ -157,9 +157,9 @@
         "array-element-newline": "off",
         "block-spacing": ["error", "always"],
         "brace-style": "off", // TODO: enable with "stroustrup" (or "1tbsp" + lots of cleanup)
-        "camelcase": "error",
+        "camelcase": "warn",
         "capitalized-comments": "off",
-        "comma-dangle": "error",
+        "comma-dangle": "warn",
         "comma-spacing": ["error", {
             "before": false,
             "after": true
