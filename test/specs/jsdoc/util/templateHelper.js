@@ -709,9 +709,6 @@ describe("jsdoc/util/templateHelper", () => {
         });
 
         it("globals are detected", () => {
-            console.error({
-              miscGlobal, "members.globals": members.globals  
-            })
             compareObjectArrays(miscGlobal, members.globals);
         });
     });
@@ -1211,9 +1208,6 @@ describe("jsdoc/util/templateHelper", () => {
 
             env.opts.access = 'package';
             pruned = helper.prune( taffy(arrayMixed) )().get();
-            console.error({
-              keepPackage, pruned  
-            })
             compareObjectArrays(keepPackage, pruned);
         });
 
@@ -1223,9 +1217,6 @@ describe("jsdoc/util/templateHelper", () => {
 
             env.opts.access = 'public';
             pruned = helper.prune( taffy(arrayMixed) )().get();
-            console.error({
-              keepPublic, pruned  
-            })
             compareObjectArrays(keepPublic, pruned);
         });
 
@@ -1244,9 +1235,6 @@ describe("jsdoc/util/templateHelper", () => {
 
             env.opts.access = 'protected';
             pruned = helper.prune( taffy(arrayMixed) )().get();
-            console.error({
-              keepProtected, pruned  
-            })
             compareObjectArrays(keepProtected, pruned);
         });
 
@@ -1256,9 +1244,6 @@ describe("jsdoc/util/templateHelper", () => {
 
             env.opts.access = 'private';
             pruned = helper.prune( taffy(arrayMixed) )().get();
-            console.error({
-              keepPrivate, pruned  
-            })
             compareObjectArrays(keepPrivate, pruned);
         });
 
@@ -1272,9 +1257,6 @@ describe("jsdoc/util/templateHelper", () => {
 
             env.opts.access = ['public', 'protected'];
             pruned = helper.prune( taffy(arrayMixed) )().get();
-            console.error({
-              keepPublicProtected, pruned  
-            })
             compareObjectArrays(keepPublicProtected, pruned);
         });
 
