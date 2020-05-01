@@ -24,7 +24,8 @@
     "strip-json-comments": "~1.0.4",
     "taffydb": "https://github.com/hegemonic/taffydb/tarball/7d100bcee0e997ee4977e273cdce60bd8933050e",
     "underscore": "~1.8.3",
-    "wrench": "~1.5.8"
+    "wrench": "~1.5.8",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "gulp": "~3.9.0",
@@ -37,7 +38,9 @@
     "node": ">=0.10"
   },
   "scripts": {
-    "test": "gulp lint; gulp test"
+    "test": "gulp lint; gulp test",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "bin": {
     "jsdoc": "./jsdoc.js"
@@ -55,5 +58,6 @@
   "maintainers": {
     "name": "Jeff Williams",
     "email": "jeffrey.l.williams@gmail.com"
-  }
+  },
+  "snyk": true
 }
