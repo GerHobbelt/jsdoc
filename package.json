@@ -19,15 +19,16 @@
     "code-prettify": "0.1.0",
     "color-themes-for-google-code-prettify": "2.0.4",
     "escape-string-regexp": "2.0.0",
-    "lodash": "4.17.11",
-    "markdown-it": "8.4.2",
+    "lodash": "4.17.21",
+    "markdown-it": "10.0.0",
     "markdown-it-anchor": "5.2.1",
-    "marked": "0.6.2",
-    "mkdirp": "0.5.1",
+    "marked": "1.1.1",
+    "mkdirp": "0.5.2",
     "open-sans-fonts": "1.5.1",
     "requizzle": "0.2.2",
     "strip-json-comments": "3.0.1",
-    "taffydb": "2.6.2"
+    "taffydb": "2.6.2",
+    "snyk": "^1.473.0"
   },
   "devDependencies": {
     "ajv": "6.10.0",
@@ -48,7 +49,9 @@
     "lint": "eslint *.js lib/**/*.js plugins/*.js templates/**/*.js test/specs/**/*.js",
     "fix": "eslint *.js lib/**/*.js plugins/*.js templates/**/*.js test/specs/**/*.js --fix",
     "test": "node jsdoc.js -T",
-    "pub": "npm publish --access public"
+    "pub": "npm publish --access public",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "bin": {
     "jsdoc": "./jsdoc.js"
@@ -73,5 +76,6 @@
       "name": "Jeff Williams",
       "email": "jeffrey.l.williams@gmail.com"
     }
-  ]
+  ],
+  "snyk": true
 }
