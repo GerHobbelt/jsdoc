@@ -22,7 +22,7 @@
     "lodash": "4.17.11",
     "markdown-it": "8.4.2",
     "markdown-it-anchor": "5.2.1",
-    "marked": "0.6.2",
+    "marked": "4.0.10",
     "mkdirp": "0.5.1",
     "open-sans-fonts": "1.5.1",
     "requizzle": "0.2.2",
