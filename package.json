@@ -15,7 +15,7 @@
     "@babel/parser": "7.4.5",
     "async": "3.0.1",
     "bluebird": "3.5.5",
-    "catharsis": "0.8.10",
+    "catharsis": "0.8.11",
     "code-prettify": "0.1.0",
     "color-themes-for-google-code-prettify": "2.0.4",
     "escape-string-regexp": "2.0.0",
@@ -25,7 +25,7 @@
     "marked": "0.6.2",
     "mkdirp": "0.5.1",
     "open-sans-fonts": "1.5.1",
-    "requizzle": "0.2.2",
+    "requizzle": "0.2.4",
     "strip-json-comments": "3.0.1",
     "taffydb": "2.6.2"
   },
